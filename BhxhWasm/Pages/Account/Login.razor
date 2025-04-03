@@ -1,0 +1,45 @@
+﻿@page "/login"
+
+@inject IBaseHttpClient Http
+@inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorage
+
+<h3>Login</h3>
+
+<div>
+    <label>Username:</label>
+    <input @bind="loginModel.Username" />
+</div>
+<div>
+    <label>Password:</label>
+    <input type="password" @bind="loginModel.Password" />
+</div>
+<div>
+    <button @onclick="HandleLogin">Login</button>
+</div>
+<p>@message</p>
+
+@code {
+    LoginDto loginModel = new LoginDto();
+    private string message = "";
+
+    private async Task HandleLogin()
+    {
+        
+        var response = await Http.Client.PostAsJsonAsync("auth/login", loginModel);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<TokenResponseDto>();
+            await LocalStorage.SetItemAsync("jwt_token", result.AccessToken); // Store token
+            message = "Login successful!";
+            Navigation.NavigateTo("/"); // Redirect to home
+        }
+        else
+        {
+            message = "Invalid credentials";
+        }
+    }
+
+    
+}
