@@ -7,19 +7,83 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Controllers\File\Rdlcs\BienBanHopQuy.rdlc" />
+    <None Remove="Controllers\File\Rdlcs\HuyenChamDiemPhong.rdlc" />
+    <None Remove="Controllers\File\Rdlcs\TongHopKetQuaCongTacQuy.rdlc" />
+    <None Remove="Controllers\File\Rdlcs\TongHopQuyPhuLuc4.rdlc" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Controllers\File\Rdlcs\BienBanHopQuy.rdlc" />
+    <EmbeddedResource Include="Controllers\File\Rdlcs\HuyenChamDiemPhong.rdlc" />
+    <EmbeddedResource Include="Controllers\File\Rdlcs\TongHopKetQuaCongTacQuy.rdlc" />
+    <EmbeddedResource Include="Controllers\File\Rdlcs\TongHopQuyPhuLuc4.rdlc" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
+    <PackageReference Include="ReportViewerCore.NETCore" Version="15.1.26" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.1.5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DataServices\DataServices.csproj" />
     <ProjectReference Include="..\DataTranfer\DataTranfer.csproj" />
+    <ProjectReference Include="..\DefaultValue\DefaultValue.csproj" />
     <ProjectReference Include="..\Quan ly Bhxh.ServiceDefaults\Quan ly Bhxh.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Dapper">
+      <HintPath>..\..\..\NugetPackage\dapper\2.1.35\lib\net7.0\Dapper.dll</HintPath>
+    </Reference>
+    <Reference Include="DongTa.BaseDapper">
+      <HintPath>..\..\DongTa Library\DongTa.BaseDapper\bin\Release\net9.0\DongTa.BaseDapper.dll</HintPath>
+    </Reference>
+    <Reference Include="DongTa.DataToExcelStream">
+      <HintPath>..\..\DongTa Library\DongTa.DataToExcelStream\bin\Release\net9.0\DongTa.DataToExcelStream.dll</HintPath>
+    </Reference>
+    <Reference Include="DongTa.QuarterInYear">
+      <HintPath>..\..\DongTa Library\DongTa.QuarterInYear\bin\Release\net9.0\DongTa.QuarterInYear.dll</HintPath>
+    </Reference>
+    <Reference Include="DongTa.ResponseMessage">
+      <HintPath>..\..\DongTa Library\DongTa.ResponseResult\bin\Release\net8.0\DongTa.ResponseMessage.dll</HintPath>
+    </Reference>
+    <Reference Include="DongTa.ResponseResult">
+      <HintPath>..\..\DongTa Library\DongTa.ResponseResult\bin\Release\net8.0\DongTa.ResponseResult.dll</HintPath>
+    </Reference>
+    <Reference Include="DongTa.TypeExtension">
+      <HintPath>..\..\DongTa Library\DongTa.TypeExtension\bin\Release\net8.0\DongTa.TypeExtension.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Datasources\ReportDataSet.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ReportDataSet.xsd</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Datasources\ReportDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ReportDataSet.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
 </Project>

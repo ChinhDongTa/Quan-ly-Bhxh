@@ -1,0 +1,79 @@
+﻿@page "/Human/Employee/EmployeeOfDept/{DeptId:int}"
+@inject HttpClientBase client
+
+<PageTitle>@ConstName.TitleEditStaff</PageTitle>
+<PageTitle>@ConstName.TitleEditStaff</PageTitle>
+<AuthorizeView Roles="tccb,admin">
+    <Authorized>
+        <LabelHeader Text="@title" />
+        <AlertMessage Message="@messages" />
+        @if (Items is null)
+        {
+            <LoadPage />
+        }
+        else if (Items.HasItems())
+        {
+            <table class="bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Họ tên</th>
+                        <th scope="col">Ngày sinh</th>
+                        <th scope="col">HSL</th>
+                        <th scope="col">Đơn vị</th>
+                        <th scope="col">Chi tiết khen thưởng</th>
+                        <th scope="col">Cập nhật</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Items)
+                    {
+                        <tr>
+                            <td>@item.FullName</td>
+                            <td>@item.Birthdate?.ToVnFormat()</td>
+                            <td>@item.Salary</td>
+                            <td>
+                                @item.PositionName
+                            </td>
+                            <td>
+                                <FluentAnchor IconEnd="@(new Icons.Regular.Size16.PreviewLink())" Href=@($"/Human/Employee/Details/{item.EmployeeId}")>@ConstName.Detail</FluentAnchor>
+                            </td>
+                            <td>
+                                <LinkEdit Url=@($"/Human/Employee/EditEmployee/{item.EmployeeId}") Text="@ConstName.Edit" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <AlertMessage Message=@InfoMessage.NotAuthorized />
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    [Parameter]
+    public int DeptId { get; set; }
+    string title = string.Empty;
+    IEnumerable<EmployeeDto>? Items;
+    string? messages;
+    protected override async Task OnParametersSetAsync()
+    {
+        if (DeptId > 0)
+        {
+            var result = await client.GetAsync<ResultDto<EmployeeDto>>(EmployeeApiRoute.GetByDeptId(DeptId));
+            if (result != null && result.IsSuccess)
+            {
+                Items = result.Dtos;
+                title = $"Nhân viên {Items?.First().DeptName}";
+                StateHasChanged();
+            }
+            else
+                messages = result?.Message?.ToString();
+        }
+        else
+        {
+            messages = InfoMessage.InvalidId("đơn vị");
+        }
+    }
+
+}

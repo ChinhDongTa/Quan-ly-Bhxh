@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.3" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="9.0.3" />
@@ -17,12 +18,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataTranfer\DataTranfer.csproj" />
+    <ProjectReference Include="..\DefaultValue\DefaultValue.csproj" />
+    <ProjectReference Include="..\HttpClientBase\HttpClientBase.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="DongTa.BaseHttpClient">
-      <HintPath>..\..\DongTa Library\DongTa.BaseHttpClient\bin\Release\net9.0\DongTa.BaseHttpClient.dll</HintPath>
-    </Reference>
     <Reference Include="DongTa.ResponseMessage">
       <HintPath>..\..\DongTa Library\DongTa.ResponseResult\bin\Release\net8.0\DongTa.ResponseMessage.dll</HintPath>
     </Reference>
@@ -32,6 +32,10 @@
     <Reference Include="DongTa.TypeExtension">
       <HintPath>..\..\DongTa Library\DongTa.TypeExtension\bin\Release\net8.0\DongTa.TypeExtension.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Pages\Human\XepLoaiQuy\" />
   </ItemGroup>
 
 </Project>

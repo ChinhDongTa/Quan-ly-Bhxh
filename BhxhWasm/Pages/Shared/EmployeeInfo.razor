@@ -1,0 +1,28 @@
+﻿
+@*
+   EmployeeInfo Component hiển thị thông tin tóm tắt của nhân viên : hoten + phòng ban
+   StaffId: Mã nhân viên
+*@
+@inject IHttpClientBase client
+@if (dto is null)
+{
+    <FluentProgressRing />
+}
+else
+{
+    <div>
+        @dto.FirstName - @dto.DeptName
+    </div>
+}
+
+@code {
+    [Parameter] public int EmployeeId { get; set; }
+    private EmployeeDto? dto;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await client.GetAsync<ResultDto<EmployeeDto>>(EmployeeApiRoute.GetOne("Employees",EmployeeId));
+        if (result != null && result.IsSuccess)
+            dto = result.Dto;
+    }
+}

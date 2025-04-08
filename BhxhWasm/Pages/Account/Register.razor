@@ -1,0 +1,63 @@
+﻿@page "/Account/register"
+@using BhxhWasm.Services
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider provider
+
+<PageTitle>Register</PageTitle>
+
+<FluentGrid>
+    <FluentGridItem xs="8" sm="4">
+        <StatusMessage Message="@Message" />
+        <EditForm Model="registerDto" method="post" OnValidSubmit="RegisterUser" FormName="register">
+            <DataAnnotationsValidator />
+            <h2>Create a new account.</h2>
+            <hr />
+            <FluentValidationSummary class="text-danger" role="alert" />
+
+            <FluentStack Orientation="Orientation.Vertical">
+                <SelectListEmployee @bind-Item="employeeDto" Label="Chọn nhân viên" />
+                <FluentTextField Name="registerDto.Email" @bind-Value="registerDto.Email" AutoComplete="username" Required="true" Placeholder="name@example.com" Label="Email" Style="width: 100%" />
+                <FluentValidationMessage For="() => registerDto.Email" class="text-danger" />
+                <FluentTextField type="password" Name="Input.Password" @bind-Value="registerDto.Password" AutoComplete="current-password" Required="true" Placeholder="password" Label="Password" Style="width: 100%" />
+                <FluentValidationMessage For="() => registerDto.Password" class="text-danger" />
+                <FluentTextField type="password" Name="registerDto.ConfirmPassword" @bind-Value="registerDto.ConfirmPassword" AutoComplete="new-password" Required="true" Placeholder="password" Label="Confirm Password" Style="width: 100%" />
+                <FluentValidationMessage For="() => registerDto.ConfirmPassword" class="text-danger" />
+                <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" Style="width: 100%">@ConstName.Registration</FluentButton>
+            </FluentStack>
+        </EditForm>
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="8">
+        <h3>Use another service to log in.</h3>
+        <hr />
+
+    </FluentGridItem>
+</FluentGrid>
+
+@code {
+    //private FormResult? result;
+    RegisterDto registerDto = new RegisterDto();
+    private string? Message;
+    EmployeeDtoForListBox? employeeDto;
+    private async Task RegisterUser()
+    {
+        if(employeeDto!=null)
+        {
+            registerDto.EmployeeId = employeeDto.EmployeeId;
+            var authStateProvider = (CustomAuthStateProvider)provider;
+            var formResult = await authStateProvider.RegisterAsync(registerDto);
+            if (formResult.IsSuccess)
+            {
+                Message = formResult.Message.Description;
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                Message = formResult.Message.ToString() ;
+            }
+        }
+        else
+        {
+            Message = InfoMessage.Unselect("nhân viên");
+        }
+    }
+}

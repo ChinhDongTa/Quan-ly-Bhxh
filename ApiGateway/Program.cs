@@ -1,10 +1,11 @@
-using ApiGateway.Services;
 using DataServices.Data;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using DataServices.Entities.Human;
+using DongTa.BaseDapper;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
-using System.Text;
+using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,8 +17,13 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<BhxhDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(connectionString));
+
+//Add Dapper connection
+builder.Services.AddTransient<IDbConnection>((sp) => new SqlConnection(connectionString));
+builder.Services.AddScoped<IGenericDapper, GenericDapper>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorWasm",
@@ -29,25 +35,21 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["AppSettings:Issuer"],
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["AppSettings:Audience"],
-            ValidateLifetime = true,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]!)),
-            ValidateIssuerSigningKey = true
-        };
-    });
-
-builder.Services.AddScoped<IAuthService, AuthService>();
-
 builder.Services.AddAuthorization();
+builder.Services.AddIdentityApiEndpoints<ApiUser>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<BhxhDbContext>();
+//.AddDefaultTokenProviders()
+//.AddDefaultIdentity<ApiUser>(options =>
+//{
+//    options.User.RequireUniqueEmail = true;
+//    options.SignIn.RequireConfirmedAccount = false;
+//    options.Password.RequireDigit = false;
+//    options.Password.RequiredLength = 6;
+//    options.Password.RequireLowercase = false;
+//    options.Password.RequireNonAlphanumeric = false;
+//    options.Password.RequireUppercase = false;
+//});
 
 var app = builder.Build();
 
@@ -61,6 +63,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowBlazorWasm");
+app.MapIdentityApi<ApiUser>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 

@@ -1,6 +1,16 @@
-@ApiGateway_HostAddress = http://localhost:5087
+@ApiGateway_HostAddress = https://localhost:7171
 
 GET {{ApiGateway_HostAddress}}/weatherforecast/
 Accept: application/json
+
+###
+
+POST {{ApiGateway_HostAddress}}/auth/login
+Content-Type: application/json
+
+{
+ "username": "dtchinh@hotmail.com",
+  "password": "123456"
+}
 
 ###

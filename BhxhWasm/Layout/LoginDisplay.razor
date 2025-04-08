@@ -1,19 +1,25 @@
-﻿@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+﻿@using BhxhWasm.Services
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider provider
 
-<AuthorizeView>
+ <AuthorizeView>
     <Authorized>
         Hello, @context.User.Identity?.Name!
         <FluentButton Appearance="Appearance.Accent" @onclick="BeginLogOut">Log out</FluentButton>
     </Authorized>
     <NotAuthorized>
-        <a href="authentication/login">Log in</a>
+        <FluentAnchor Appearance="Appearance.Neutral"  Href="Account/Login">Login</FluentAnchor> -
+        <FluentAnchor Appearance="Appearance.Neutral" Href="Account/Register">Register</FluentAnchor>
     </NotAuthorized>
 </AuthorizeView>
+
 
 @code{
     public void BeginLogOut()
     {
-        Navigation.NavigateToLogout("authentication/logout");
+        var authStateProvider = (CustomAuthStateProvider)provider;
+        authStateProvider.Logout();
+        Navigation.NavigateToLogout("/");
     }
 }
