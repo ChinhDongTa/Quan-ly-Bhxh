@@ -1,0 +1,85 @@
+﻿@page "/Account/Admin/Index"
+@inject IHttpClientBase client
+@*@inject RoleManager<IdentityRole> roleManager;*@
+
+<AuthorizeView Roles="admin">
+    <Authorized>
+        @if (userDtos is null)
+        {
+            <LoadPage />
+        }
+        else if (userDtos.HasItems())
+        {
+            <table class="bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">UserName</th>
+                        <th>Nhân viên</th>
+                        <th scope="col">Role</th>
+                        <th scope="col">Edit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in userDtos)
+                    {
+                        <tr>
+                            <td class="align-middle">
+                                @item.UserName
+                            </td>
+                            <td class="align-middle">
+                                <EmployeeInfo EmployeeId="@item.EmployeeId" />
+                            </td>
+                            <td class="align-middle">
+                                @item.Roles
+                            </td>
+                            <td class="align-middle">
+                                <LinkEdit Url=@string.Format("/Account/Admin/Edit/{0}",item.Id) Text="Edit" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4">
+                            <strong>Tổng cổng: @userDtos.Count()</strong>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <AlertMessage Message=@InfoMessage.NotAuthorized />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private IEnumerable<ApiUserDto>? userDtos = Enumerable.Empty<ApiUserDto>();
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await client.GetAsync<ResultDto<ApiUserDto>>(AccountApiRoute.All);
+        if (result != null && result.IsSuccess)
+        {
+            userDtos = result.Dtos;
+        }
+       
+        else
+        {
+            // Handle error
+            userDtos = Enumerable.Empty<ApiUserDto>();
+        }
+        
+        //StateHasChanged();
+    }
+
+    // private async Task<IEnumerable<IdentityUserDto>> GetIdentityUserDtos(IEnumerable<AppUser> users)
+    // {
+    //     var list = new List<IdentityUserDto>();
+    //     foreach (var item in users)
+    //     {
+    //         var dto = new IdentityUserDto(item.Id, item.UserName ?? string.Empty, string.Join(", ", await userManager.GetRolesAsync(item)), item.EmployeeId);
+    //         list.Add(dto);
+    //     }
+    //     return list;
+    // }
+}

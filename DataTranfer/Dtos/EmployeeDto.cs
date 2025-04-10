@@ -1,7 +1,7 @@
 ﻿namespace DataTranfer.Dtos;
 
 public record EmployeeDto {
-    public int EmployeeId { get; set; }
+    public int Id { get; set; }
 
     public string FirstName { get; set; } = null!;
 

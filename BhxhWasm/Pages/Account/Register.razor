@@ -42,7 +42,7 @@
     {
         if(employeeDto!=null)
         {
-            registerDto.EmployeeId = employeeDto.EmployeeId;
+            registerDto.EmployeeId = employeeDto.Id;
             var authStateProvider = (CustomAuthStateProvider)provider;
             var formResult = await authStateProvider.RegisterAsync(registerDto);
             if (formResult.IsSuccess)

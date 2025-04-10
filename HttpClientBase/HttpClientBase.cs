@@ -4,9 +4,11 @@ namespace HttpClientBase;
 
 public class HttpClientBase(HttpClient _httpClient) : IHttpClientBase {
 
-    public Task<TResponse?> DeleteAsync<TResponse>(string url)
+    public async Task<TResponse?> DeleteAsync<TResponse>(string url)
     {
-        throw new NotImplementedException();
+        var response = await _httpClient.DeleteAsync(url);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<TResponse>();
     }
 
     public async Task<TResponse?> GetAsync<TResponse>(string url)
@@ -30,14 +32,9 @@ public class HttpClientBase(HttpClient _httpClient) : IHttpClientBase {
         return await response.Content.ReadFromJsonAsync<TResponse>();
     }
 
-    public void SetAuthorizationHeaderAsync(string? token, string tokenType = "Bearer")
+    public void SetAuthorizationHeader(string? token = null, string tokenType = "Bearer")
     {
-        if (string.IsNullOrEmpty(token))
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = null;
-            return;
-        }
-        _httpClient.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue(tokenType, token);
+        _httpClient.DefaultRequestHeaders.Authorization = string.IsNullOrEmpty(token) ? null :
+                            new System.Net.Http.Headers.AuthenticationHeaderValue(tokenType, token);
     }
 }

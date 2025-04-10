@@ -1,7 +1,7 @@
 ﻿namespace DataServices.Entities.Human;
 
 public partial class Department {
-    public int DepartmentId { get; set; }
+    public int Id { get; set; }
 
     public string ShortName { get; set; } = null!;
 

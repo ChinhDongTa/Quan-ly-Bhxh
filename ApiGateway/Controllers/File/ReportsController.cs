@@ -42,7 +42,7 @@ public class ReportsController(BhxhDbContext context, IGenericDapper dapper) : C
                 using LocalReport report = new();
                 DateTime now = DateTime.Now.AddDays(ReadOnlyValue.SubDay);
                 byte currentQuarter = DateTimeExtension.GetCurrentQuarter(now.Month);
-                var ds = await context.GetQuarterEmployeeRankDtoByDeptId(deptDto.DepartmentId, new QuarterInYear(currentQuarter, now.Year));
+                var ds = await context.GetQuarterEmployeeRankDtoByDeptId(deptDto.Id, new QuarterInYear(currentQuarter, now.Year));
                 string content = "1. Đánh giá tình hình công tác quý {0} năm {1}, triển khai nhiệm vụ quý {2} năm {3}. Bình xét thi đua, khen thưởng quý {0} năm {1}";
                 if (currentQuarter == 4)
                     content = string.Format(content, currentQuarter, now.Year, 1, now.Year + 1);

@@ -9,7 +9,7 @@ public static class QuarterEmployeeRankMapper {
     {
         return new()
         {
-            QuarterEmployeeRankId = quarterEmployeeRank.QuarterEmployeeRankId,
+            Id = quarterEmployeeRank.Id,
             EmployeeId = quarterEmployeeRank.EmployeeId,
             EmployeeName = $"{quarterEmployeeRank.Employee?.FirstName} {quarterEmployeeRank.Employee?.LastName}",
             RewardId = quarterEmployeeRank.RewardId,
@@ -30,7 +30,7 @@ public static class QuarterEmployeeRankMapper {
         {
             return new()
             {
-                QuarterEmployeeRankId = dto.QuarterEmployeeRankId,
+                Id = dto.Id,
                 EmployeeId = dto.EmployeeId,
                 RewardId = dto.RewardId,
                 Quarter = dto.Quarter,

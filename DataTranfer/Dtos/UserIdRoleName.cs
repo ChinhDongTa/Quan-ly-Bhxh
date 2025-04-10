@@ -1,6 +1,6 @@
 ﻿namespace DataTranfer.Dtos;
 
-public record AddRoleToUserDto {
+public record UserIdRoleName {
     public string UserId { get; set; } = string.Empty;
-    public string RoleId { get; set; } = string.Empty;
+    public string RoleName { get; set; } = string.Empty;
 }

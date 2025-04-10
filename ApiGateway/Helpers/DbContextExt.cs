@@ -25,7 +25,7 @@ public static class DbContextExt {
         var current = QuarterInYear.Before(DateTime.Now.AddDays(ReadOnlyValue.SubDay));
         var result = await context.QuarterDepartmentRanks
                     .Where(x => x.DeptId == deptId && x.Quarter == current.Quarter && x.Year == current.Year)
-                    .Select(x => x.ToDto()).FirstAsync();
+                    .Select(x => x.ToDto()).FirstOrDefaultAsync();
         if (result is not null)
         {
             return result;
@@ -36,7 +36,7 @@ public static class DbContextExt {
             {
                 var quarterDepartmentRank = new QuarterDepartmentRank
                 {
-                    DeptId = dept.DepartmentId,
+                    DeptId = dept.Id,
                     Quarter = current.Quarter,
                     Year = current.Year,
                     RewardId = 22// loại A
@@ -67,7 +67,7 @@ public static class DbContextExt {
         {
             //lấy danh sách Id nhân viên của phòng ban
             var employeIdOfDept = await context.Employees.Where(x => x.DeptId == deptId && x.IsQuitJob == false)
-                                   .Select(x => x.EmployeeId).ToListAsync();
+                                   .Select(x => x.Id).ToListAsync();
             //Nếu 2 ds trùng nhau thì trả về current
             if (employeIdOfDept.Count == currentQuarterEmployeeRankDto.Count &&
                 employeIdOfDept.MatchAll(currentQuarterEmployeeRankDto.Select(x => x.EmployeeId)))
@@ -114,10 +114,10 @@ public static class DbContextExt {
         if (quarter.Year == currentQuarter.Year && quarter.Quarter > currentQuarter.Quarter)
             return true;
         var employeeIds = await context.Employees.Where(x => x.DeptId == deptId && x.IsQuitJob == false)
-            .Select(x => x.EmployeeId).ToListAsync();
+            .Select(x => x.Id).ToListAsync();
         if (employeeIds.Count == 0)
             return false;
-        int A2 = deptId == 1 ? 22 : 23;//deptId=1 Ban giám đốc luôn dc A1=22
+        int A2 = deptId == 1 ? 20 : 21;//deptId=1 Ban giám đốc luôn dc A,A1=20, A2,B=21, C=22, D=23
         foreach (var employeeId in employeeIds)
         {
             var beforeQuarter = QuarterInYear.Before(quarter);

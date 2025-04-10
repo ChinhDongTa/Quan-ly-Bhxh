@@ -34,7 +34,7 @@ public class SalaryCoefficientsController(BhxhDbContext context) : ControllerBas
     [HttpPut(ActionBase.Update + "/{id}")]
     public async Task<IActionResult> Update(int id, SalaryCoefficient salaryCoefficient)
     {
-        if (id != salaryCoefficient.SalaryCoefficientId)
+        if (id != salaryCoefficient.Id)
         {
             return Ok(Result<bool>.Failure(InfoMessage.InvalidId(nameof(SalaryCoefficient))));
         }
@@ -87,6 +87,6 @@ public class SalaryCoefficientsController(BhxhDbContext context) : ControllerBas
 
     private bool SalaryCoefficientExists(int id)
     {
-        return context.SalaryCoefficients.Any(e => e.SalaryCoefficientId == id);
+        return context.SalaryCoefficients.Any(e => e.Id == id);
     }
 }

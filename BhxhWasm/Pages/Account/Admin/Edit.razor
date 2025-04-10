@@ -1,0 +1,123 @@
+﻿@page "/Account/Admin/Edit/{Id}"
+@inject IHttpClientBase client
+
+<AuthorizeView Roles="admin">
+    <Authorized>
+        <LabelHeader Text="Quản lý user" />
+        <hr />
+        @if (userDto is null)
+        {
+            <LoadPage />
+        }
+        else
+        {
+            <AlertMessage Message="@message" />
+            <FluentStack>
+                <FluentTextField style="width:500px;" Value="@($"Tài khoản: {@userDto.UserName}, Roles: { @userDto.Roles}")" ReadOnly />
+                <FluentTextField style="width:200px;" @bind-value="confirm" Placeholder="To comfirm, type 'yes'" />
+                <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" Appearance="Appearance.Accent" @onclick="DeleteUser">Delete User</FluentButton>
+            </FluentStack>
+            <hr style="margin-top:30px" />
+            <FluentStack>
+                <FluentTextField @bind-value="roleNameRemove" Placeholder="Type role name to remove" style="width:300px;" />
+                <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" Appearance="Appearance.Accent" @onclick="RemoveRole">Remove Role</FluentButton>
+            </FluentStack>
+            <hr style="margin-top:30px" />
+            <FluentStack>
+                <FluentTextField @bind-value="newRoleName" Placeholder="Type new role name" style="width:300px;" />
+                <FluentButton IconStart="@(new Icons.Regular.Size16.Add())" Appearance="Appearance.Accent" @onclick="AddRole">Add Role</FluentButton>
+                <FluentLabel Color="Color.Warning">@rolesName</FluentLabel>
+            </FluentStack>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <AlertMessage Message=@InfoMessage.NotAuthorized />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private string? roleNameRemove;
+    private string? newRoleName;
+    private string? rolesName;
+    private string confirm = string.Empty;
+    private string? message;
+    private ApiUserDto? userDto;
+    [Parameter] public string Id { get; set; } = string.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await client.GetAsync<ResultDto<ApiUserDto>>(AccountApiRoute.GetOne(Id));
+        rolesName = await GetRolesName();
+        if (result != null && result.IsSuccess)
+        {
+            userDto = result.Dto;
+            //rolesName = string.Join(", ", userDto.Roles);
+        }
+        else
+        {
+            message = result?.Message?.ToString();
+        }
+    }
+
+    async Task AddRole()
+    {
+        if (!string.IsNullOrEmpty(newRoleName))
+        {
+            var result = await client.PostAsync<UserIdRoleName, ResultDto<bool>>(AccountApiRoute.AddRoleToUser,
+                                                new UserIdRoleName { UserId = Id, RoleName = newRoleName });
+            if (result != null && result.IsSuccess)
+            {
+                message = InfoMessage.ActionSuccess(CRUD.Create, "Role");
+            }
+            else
+                message = InfoMessage.ActionFailed(CRUD.Create, "Role");
+        }
+    }
+
+
+
+    async Task RemoveRole()
+    {
+        if (!string.IsNullOrEmpty(roleNameRemove))
+        {
+            var result = await client.PostAsync<UserIdRoleName, ResultDto<bool>>(AccountApiRoute.RemoveRoleFromUser, 
+                                                new UserIdRoleName { UserId= Id, RoleName= roleNameRemove });
+            if (result != null && result.IsSuccess)
+            {
+                message = InfoMessage.ActionSuccess(CRUD.Delete, "Role");
+            }
+            else
+                message = InfoMessage.ActionFailed(CRUD.Delete, "Role");
+        }
+    }
+
+    async Task DeleteUser()
+    {
+        //string[] values = new string[] { "yes" };
+        var yes = confirm.ContainsAll(["yes"]);
+        if (yes)
+        {
+            confirm = "deleted";
+            var result = await client.DeleteAsync<ResultDto<bool>>(AccountApiRoute.Delete(Id));
+            if (result != null && result.IsSuccess)
+            {
+                message = InfoMessage.ActionSuccess(CRUD.Delete, "user");
+            }
+            else
+            {
+                message = InfoMessage.ActionFailed(CRUD.Delete, "user");
+            }
+        }
+    }
+
+    async Task<string?> GetRolesName()
+    {
+        var result = await client.GetAsync<ResultDto<string>>(AccountApiRoute.GetAllRoleName);
+        if (result != null && result.IsSuccess)
+        {
+            return string.Join(", ", result.Dtos!);
+        }
+        return null;
+    }
+}

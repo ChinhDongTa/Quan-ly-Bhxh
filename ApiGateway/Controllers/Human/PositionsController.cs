@@ -36,7 +36,7 @@ public class PositionsController(BhxhDbContext context) : ControllerBase {
     [HttpPut(ActionBase.Update + "/{id}")]
     public async Task<IActionResult> Update(int id, Position position)
     {
-        if (id != position.PositionId)
+        if (id != position.Id)
         {
             return BadRequest();
         }
@@ -70,7 +70,7 @@ public class PositionsController(BhxhDbContext context) : ControllerBase {
         context.Positions.Add(position);
         await context.SaveChangesAsync();
 
-        return CreatedAtAction("GetPosition", new { id = position.PositionId }, position);
+        return CreatedAtAction("GetPosition", new { id = position.Id }, position);
     }
 
     // DELETE: api/Positions/5
@@ -91,6 +91,6 @@ public class PositionsController(BhxhDbContext context) : ControllerBase {
 
     private bool PositionExists(int id)
     {
-        return context.Positions.Any(e => e.PositionId == id);
+        return context.Positions.Any(e => e.Id == id);
     }
 }

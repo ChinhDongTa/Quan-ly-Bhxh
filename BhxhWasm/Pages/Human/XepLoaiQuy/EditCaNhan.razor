@@ -1,0 +1,101 @@
+﻿@page "/Human/XepLoaiQuy/EditCaNhan/{Id:int}"
+
+@inject IHttpClientBase client
+<PageTitle>Cập nhật kết quả xếp loại quý của nhân viên</PageTitle>
+<AuthorizeView>
+    <Authorized>
+        @if(dto is null)
+        {
+            <LoadPage />
+        }
+        else
+        {
+            <LabelHeader Text="@($"Cập nhật kết quả xếp loại quý {dto.Quarter} năm {dto.Year} của {dto.EmployeeName}")"/>
+            <AlertMessage Message="@Message" />
+            <FluentGrid>
+                <FluentGridItem>
+                    <FluentNumberField @bind-Value="totalWorkQuarter" Label="Tổng số công việc phải thực hiện trong quý" />
+                    <FluentNumberField @bind-Value="numWorkedQuarter" Label="Số công việc đã thực hiện" />
+                    <FluentTextArea Cols=40 @bind-Value="dto.Note" Label="Ghi chú" />
+                </FluentGridItem>
+                <FluentGridItem>
+                    <FluentNumberField @bind-Value="dto.SelfScore" Label="Điểm tự chấm" />
+                    <FluentNumberField @bind-Value="dto.ResultScore" Label="Điểm xét duyệt" />
+                    <SelectListReward @bind-Item="KqxlSelected" Classify="Q" DefaultId="dto.RewardId" Label="Kết quả xếp loại" />
+                </FluentGridItem>
+            </FluentGrid>
+
+            <FluentStack style="margin:20px">
+                <FluentButton Appearance="Appearance.Accent" @onclick="SaveBtn">@ConstName.BtnSave</FluentButton>
+                <FluentAnchor IconStart="@(new Icons.Regular.Size16.ArrowStepBack())" Href="Human/XeploaiQuy/Canhan">@ConstName.BtnBack</FluentAnchor>
+                @if(context.User.IsInRole("tccb")||context.User.IsInRole("admin"))
+                {
+                    <FluentAnchor IconStart="@(new Icons.Regular.Size16.ArrowStepBack())" Href="Human/XeploaiQuy/BinhXet">Bình xét đơn vị</FluentAnchor>
+                }
+            </FluentStack>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <AlertMessage Message=@InfoMessage.NotAuthorized />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    string? Message;
+    int totalWorkQuarter, numWorkedQuarter;
+    IList<string>? errors = new List<string>();
+    QuarterEmployeeRankDto? dto = null;
+    RewardDto? KqxlSelected;
+   
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id>0)
+        {
+            var result = await client.GetAsync<ResultDto<QuarterEmployeeRankDto>>(QuarterEmployeeRankApiRoute.GetOne(QuarterEmployeeRankApiRoute.ControllerName, Id));
+            if (result is not null && result.Dto is not null)
+            {
+                dto = result.Dto;
+                totalWorkQuarter = dto.TotalWork ?? 0;
+                numWorkedQuarter = dto.NumWorked ?? 0;
+            }
+            else
+            {
+                Message = result?.Message?.ToString();
+                dto = new QuarterEmployeeRankDto();
+            }
+            StateHasChanged();
+        }
+    }
+
+    async Task SaveBtn()
+    {
+        if (dto is not null)
+        {
+            if (KqxlSelected is null)
+            {
+                errors?.Add(InfoMessage.Unselect("kết quả xếp loại"));
+            }
+            else
+                dto.RewardId = KqxlSelected.Id;
+
+            dto.TotalWork = (byte)totalWorkQuarter;
+            dto.NumWorked = (byte)numWorkedQuarter;
+            if (errors.HasItems())
+            {
+                Message = errors.ToErrorString();
+            }
+            else
+            {
+                var ok = await client.PutAsync<QuarterEmployeeRankDto,ResultDto<bool>>(QuarterEmployeeRankApiRoute.Update(QuarterEmployeeRankApiRoute.ControllerName, Id), dto);
+                if (ok is not null && ok.IsSuccess)
+                {
+                    Message = InfoMessage.Success;
+                }
+                else
+                    Message = ok?.Message?.ToString();
+            }
+        }
+    }
+}

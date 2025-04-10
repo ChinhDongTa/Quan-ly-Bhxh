@@ -1,7 +1,7 @@
 ﻿namespace DataServices.Entities.Human;
 
 public partial class SalaryCoefficient {
-    public int SalaryCoefficientId { get; set; }
+    public int Id { get; set; }
 
     public byte Rank { get; set; }
 

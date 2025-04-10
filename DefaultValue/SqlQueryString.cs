@@ -8,7 +8,7 @@ public static class SqlQueryString {
 
     private static readonly string SelectDepartmentDto = $"""
         SELECT
-          d.DepartmentId,
+          d.Id,
           d.Name,
           d.ShortName,
           d.Score,
@@ -19,14 +19,14 @@ public static class SqlQueryString {
           d.LevelId,
           [Level].Name AS LevelName
         FROM
-          Department AS d
-          INNER JOIN Employee ON d.DepartmentId = Employee.DeptId
-          INNER JOIN [Level] ON d.LevelId = [Level].LevelId
+          Departments AS d
+          INNER JOIN Employees ON d.Id = Employees.DeptId
+          INNER JOIN [Level] ON d.LevelId = [Level].Id
         """;
 
     public static string SelectDepartmentDtoByUserId(string userId) => $"""
         {SelectDepartmentDto}
-        INNER JOIN AspNetUsers AS a ON a.EmployeeId = Employee.EmployeeId
+        INNER JOIN AspNetUsers AS a ON a.EmployeeId = Employees.Id
         WHERE
           a.Id = '{userId}'
         """;
@@ -34,12 +34,12 @@ public static class SqlQueryString {
     public static string SelectDepartmentDtoByEmployeeId(int employeeId) => $"""
         {SelectDepartmentDto}
         WHERE
-          EmployeeId = {employeeId}
+          Employees.Id = {employeeId}
         """;
 
     public static string SelectEmployeeDto { get; } = $"""
         SELECT
-          e.EmployeeId,
+          e.Id,
           e.FirstName,
           e.LastName,
           e.Email,
@@ -59,11 +59,11 @@ public static class SqlQueryString {
           e.TelegramId,
           e.Gender
         FROM
-          Department as d
-          INNER JOIN Employee AS e ON d.DepartmentId = e.DeptId
-          INNER JOIN Position as p ON e.PostId = p.PositionId
-          INNER JOIN SalaryCoefficient as s ON e.SalaryCoefficientId = s.SalaryCoefficientId
-          INNER JOIN AspNetUsers ON e.EmployeeId = AspNetUsers.EmployeeId
+          Departments as d
+          INNER JOIN Employees AS e ON d.Id = e.DeptId
+          INNER JOIN Positions as p ON e.PostId = p.Id
+          INNER JOIN SalaryCoefficients as s ON e.SalaryCoefficientId = s.Id
+          INNER JOIN AspNetUsers ON e.Id = AspNetUsers.EmployeeId
         """;
 
     public static string GetDeptHeadByUserId(string userId)
@@ -75,19 +75,19 @@ public static class SqlQueryString {
             WHERE
               e.IsQuitJob = 0
               AND e.DeptId = @deptId
-              AND e.SortOrder = (SELECT MIN(Employee.SortOrder)
-                                 FROM Employee
-                                 WHERE Employee.IsQuitJob = 0 AND Employee.DeptId = @deptId)
+              AND e.SortOrder = (SELECT MIN(Employees.SortOrder)
+                                 FROM Employees
+                                 WHERE Employees.IsQuitJob = 0 AND Employees.DeptId = @deptId)
             """;
     }
 
     public static string SelectDeptIdByUserId(string userId) => $"""
             SELECT
-              Department.DepartmentId
+              Departments.Id
             FROM
-              Department
-              INNER JOIN Employee ON Department.DepartmentId = Employee.DeptId
-              INNER JOIN AspNetUsers ON AspNetUsers.EmployeeId = Employee.EmployeeId
+              Departments
+              INNER JOIN Employees ON Departments.Id = Employees.DeptId
+              INNER JOIN AspNetUsers ON AspNetUsers.EmployeeId = Employees.Id
             WHERE
               (AspNetUsers.Id = '{userId}')
             """;
@@ -100,11 +100,11 @@ public static class SqlQueryString {
               q.Year,
               r.Name AS RewardName
             FROM
-              Employee as e
-              INNER JOIN QuarterEmployeeRank AS q ON e.EmployeeId = q.EmployeeId
-              INNER JOIN Reward AS r ON r.RewardId = q.RewardId
+              Employees as e
+              INNER JOIN QuarterEmployeeRanks AS q ON e.Id = q.EmployeeId
+              INNER JOIN Rewards AS r ON r.Id = q.RewardId
             where
-              e.EmployeeId = {employeeId}
+              e.Id = {employeeId}
               AND (
                     (q.Year = {q1.Year} AND q.Quarter = {q1.Quarter})
                     OR
@@ -126,21 +126,21 @@ public static class SqlQueryString {
 
     public static string SelectDepartmentRankDto { get; } = $"""
         SELECT
-          QuarterDepartmentRank.QuarterDepartmentRankId,
-          QuarterDepartmentRank.DeptId,
-          Department.Name AS DeptName,
-          QuarterDepartmentRank.RewardId,
-          Reward.Name AS RewardName,
-          QuarterDepartmentRank.Quarter,
-          QuarterDepartmentRank.Year,
-          QuarterDepartmentRank.SelfScore,
-          QuarterDepartmentRank.ResultScore,
-          Department.Score AS BaseCore,
-          QuarterDepartmentRank.Note
+          q.Id,
+          q.DeptId,
+          Departments.Name AS DeptName,
+          q.RewardId,
+          r.Name AS RewardName,
+          q.Quarter,
+          q.Year,
+          q.SelfScore,
+          q.ResultScore,
+          Departments.Score AS BaseCore,
+          q.Note
         FROM
           Department
-          INNER JOIN QuarterDepartmentRank ON Department.DepartmentId = QuarterDepartmentRank.DeptId
-          INNER JOIN Reward ON QuarterDepartmentRank.RewardId = Reward.RewardId
+          INNER JOIN QuarterDepartmentRanks as q ON Departments.Id = q.DeptId
+          INNER JOIN Rewards as r ON q.RewardId = r.Id
         """;
 
     #endregion EmployeeDb

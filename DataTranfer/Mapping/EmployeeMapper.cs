@@ -9,7 +9,7 @@ public static class EmployeeMapper {
     {
         return new()
         {
-            EmployeeId = employee.EmployeeId,
+            Id = employee.Id,
             FirstName = employee.FirstName,
             LastName = employee.LastName,
             Birthdate = employee.Birthdate,
@@ -37,7 +37,7 @@ public static class EmployeeMapper {
         {
             return new()
             {
-                EmployeeId = dto.EmployeeId,
+                Id = dto.Id,
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
                 Birthdate = dto.Birthdate,

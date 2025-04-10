@@ -1,23 +1,21 @@
-﻿using DataServices.Data;
+﻿using ApiGateway.Helpers;
+using DataServices.Data;
+using DataServices.Entities.Human;
 using DataTranfer.Dtos;
+using DataTranfer.Mapping;
 using DefaultValue;
 using DefaultValue.ApiRoute;
 using DongTa.BaseDapper;
-using DongTa.ResponseResult;
-using DataTranfer.Mapping;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DataServices.Entities.Human;
 using DongTa.QuarterInYear;
 using DongTa.ResponseMessage;
-using ApiGateway.Helpers;
-using Microsoft.AspNetCore.Authorization;
+using DongTa.ResponseResult;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiGateway.Controllers.Human;
 
 [Route("[controller]")]
 [ApiController]
-[Authorize]
 public class QuarterEmployeeRanksController(BhxhDbContext context, IGenericDapper dapper) : ControllerBase {
 
     #region cá nhân
@@ -29,12 +27,12 @@ public class QuarterEmployeeRanksController(BhxhDbContext context, IGenericDappe
         return await context.QuarterEmployeeRanks.ToListAsync();
     }
 
-    [HttpGet("GetByQuarter/{quarter}/{year}")]
-    public async Task<IActionResult> GetByQuarter(byte quarter, int year)
+    [HttpGet("GetByDeptIdAndQuarter/{deptId}/{quarter}/{year}")]
+    public async Task<IActionResult> GetByQuarter(int deptId, byte quarter, int year)
     {
-        return Ok(ResultExtension.GetResult(await context.QuarterEmployeeRanks
-                    .Where(x => x.Quarter == quarter && x.Year == year)
-                    .Select(x => x.ToDto()).ToListAsync()));
+        return Ok(ResultExtension.GetResult(
+                await context.GetQuarterEmployeeRankDtoByDeptId(deptId, new QuarterInYear { Quarter = quarter, Year = year }))
+            );
     }
 
     /// <summary>
@@ -61,30 +59,6 @@ public class QuarterEmployeeRanksController(BhxhDbContext context, IGenericDappe
             await context.GetQuarterEmployeeRankDtoByDeptId(deptId, new QuarterInYear(DateTime.Now.AddDays(ReadOnlyValue.SubDay)))));
     }
 
-    /// <summary>
-    /// Lấy kết quả xếp loại 3 quý trước của 1 đơn vị
-    /// </summary>
-    /// <param name="deptId"></param>
-    /// <returns></returns>
-    [HttpGet("Get3QuarterBeforeByDeptId/{deptId}")]
-    public async Task<IActionResult> Get3QuarterBeforeByDeptId(int deptId)
-    {
-        //QuarterInYear q1 = QuarterInYear.After(DateTime.Now.AddDays(ReadOnlyValue.SubDay));
-        //QuarterInYear q2 = QuarterInYear.After(q1);
-        //QuarterInYear q3 = QuarterInYear.After(q2);
-        //var list3 = await dapper.GetByQueryAsync<QuarterEmployeeRankDto>(SqlQueryString.SelectTop3QuarterEmployeeRank(deptId, q1, q2, q3));
-
-        //var result = list3?.DistinctBy(x => x.EmployeeId)
-        //                                                .Select(x => new Result3QuarterEmployeeRankDto
-        //                                                {
-        //                                                    EmployeeId = x.EmployeeId,
-        //                                                    EmployeeName = x.EmployeeName!,
-        //                                                    TotalReward = GetTotalReward(list3, x.EmployeeId)
-        //                                                });
-        //return Ok(ResultExtension.GetResult(result));
-        return NoContent();
-    }
-
     [HttpGet("Get3QuarterBeforeByEmployeeId/{employeeId}")]
     public async Task<IActionResult> Get3QuarterBeforeByEmployeeId(int employeeId)
     {
@@ -107,7 +81,7 @@ public class QuarterEmployeeRanksController(BhxhDbContext context, IGenericDappe
     [HttpGet(ActionBase.GetOne + "/{id}")]
     public async Task<IActionResult> GetOne(int id)
     {
-        return Ok(ResultExtension.GetResult(await context.QuarterEmployeeRanks.Where(x => x.QuarterEmployeeRankId == id).Include(x => x.Employee)
+        return Ok(ResultExtension.GetResult(await context.QuarterEmployeeRanks.Where(x => x.Id == id).Include(x => x.Employee)
             .Select(x => x.ToDto()).FirstOrDefaultAsync()));
     }
 
@@ -116,7 +90,7 @@ public class QuarterEmployeeRanksController(BhxhDbContext context, IGenericDappe
     [HttpPut(ActionBase.Update + "/{id}")]
     public async Task<IActionResult> Update(int id, QuarterEmployeeRankDto dto)
     {
-        if (id != dto.QuarterEmployeeRankId)
+        if (id != dto.Id)
         {
             return Ok(Result<bool>.Failure(Message.Notfound));
         }
@@ -158,7 +132,7 @@ public class QuarterEmployeeRanksController(BhxhDbContext context, IGenericDappe
         }
         catch (DbUpdateException)
         {
-            if (QuarterEmployeeRankExists(dto.QuarterEmployeeRankId))
+            if (QuarterEmployeeRankExists(dto.Id))
             {
                 return Conflict();
             }
@@ -192,6 +166,6 @@ public class QuarterEmployeeRanksController(BhxhDbContext context, IGenericDappe
 
     private bool QuarterEmployeeRankExists(int id)
     {
-        return context.QuarterEmployeeRanks.Any(e => e.QuarterEmployeeRankId == id);
+        return context.QuarterEmployeeRanks.Any(e => e.Id == id);
     }
 }

@@ -1,0 +1,67 @@
+﻿@page "/Human/XepLoaiQuy/DeleteCaNhan/{Id:int}"
+
+
+@inject IHttpClientBase client
+<PageTitle>Xóa kết quả xếp loại quý của nhân viên</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        @if (dto is null)
+        {
+            <LoadPage />
+        }
+        else
+        {
+            <LabelHeader Text="@($"Bạn có muốn xóa kết quả xếp loại quý {dto.Quarter} năm {dto.Year} của {dto.EmployeeName} không ?")" />
+            <AlertMessage Message="@Message" />
+
+            <FluentStack style="margin:20px">
+                <FluentButton Appearance="Appearance.Accent" @onclick="SaveBtn">@ConstName.BtnSave</FluentButton>
+                <FluentAnchor IconStart="@(new Icons.Regular.Size16.ArrowStepBack())" Href="XeploaiQuy/Canhan">@ConstName.BtnBack</FluentAnchor>
+                @if (context.User.IsInRole("tccb") || context.User.IsInRole("admin"))
+                {
+                    <FluentAnchor IconStart="@(new Icons.Regular.Size16.Delete())" Href="XeploaiQuy/BinhXet">Bình xét đơn vị</FluentAnchor>
+                }
+            </FluentStack>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <AlertMessage Message=@InfoMessage.NotAuthorized />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    string? Message;
+    IList<string>? errors = new List<string>();
+    QuarterEmployeeRankDto? dto = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await client.GetAsync<ResultDto<QuarterEmployeeRankDto>>(QuarterEmployeeRankApiRoute.GetOne(QuarterEmployeeRankApiRoute.ControllerName, Id));
+        if (result is not null && result.Dto is not null)
+        {
+            dto = result.Dto;
+            // totalWorkQuarter = dto.TotalWork ?? 0;
+            // numWorkedQuarter = dto.NumWorked ?? 0;
+        }
+        else
+            Message = result?.Message?.ToString();
+        //StateHasChanged();
+
+    }
+
+    async Task SaveBtn()
+    {
+        if (dto is not null)
+        {
+            var ok = await client.DeleteAsync<ResultDto<bool>>(QuarterEmployeeRankApiRoute.Delete(QuarterEmployeeRankApiRoute.ControllerName, Id));
+            if (ok is null)
+
+                Message = InfoMessage.PostFailed;
+            else
+                Message = ok.Message?.ToString();
+        }
+    }
+}

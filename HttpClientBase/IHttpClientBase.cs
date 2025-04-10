@@ -38,5 +38,5 @@ public interface IHttpClientBase {
     /// <returns></returns>
     Task<TResponse?> DeleteAsync<TResponse>(string url);
 
-    void SetAuthorizationHeaderAsync(string? token, string tokenType = "Bearer");
+    void SetAuthorizationHeader(string? token = null, string tokenType = "Bearer");
 }

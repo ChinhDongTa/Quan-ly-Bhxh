@@ -3,11 +3,11 @@
 @if (items.HasItems())
 {
     <FluentSelect Items="@items"
-                  @onchange="ItemChangedHandle"
-                  OptionValue="@(x=>x!.RewardId.ToString())"
-                  OptionText="@(x=>x!.Name)"
-                  SelectedOption="@Item"
-                  Label="@Label" />
+    @onchange="ItemChangedHandle"
+    OptionValue="@(x=>x!.Id.ToString())"
+    OptionText="@(x=>x!.Name)"
+    SelectedOption="@Item"
+    Label="@Label" />
 }
 else
 {
@@ -41,7 +41,7 @@ else
     public string Label { get; set; } = "Hình thức";
 
     private void ItemChangedHandle(ChangeEventArgs e)
-    => Item = items.First(x => x.RewardId == int.Parse(e.Value?.ToString() ?? string.Empty));
+    => Item = items.First(x => x.Id == int.Parse(e.Value?.ToString() ?? string.Empty));
 
     private IEnumerable<RewardDto> items = Enumerable.Empty<RewardDto>();
 
@@ -50,12 +50,17 @@ else
         var apiResult = await client.GetAsync<ResultDto<RewardDto>>(RewardApiRoute.All(RewardApiRoute.ControllerName));
         if (apiResult != null && apiResult.Dtos != null)
         {
-            items = apiResult.Dtos;
+            if (!string.IsNullOrEmpty(Classify))
+            {
+                items = apiResult.Dtos.Where(x => x.Classify == Classify);
+            }
+            else
+                items = apiResult.Dtos;
             if (items.HasItems())
             {
-                if (DefaultId.HasValue)
+                if (DefaultId > 0)
                 {
-                    Item = items!.First(x => x.RewardId == DefaultId);
+                    Item = items!.First(x => x.Id == DefaultId);
                 }
                 else
                     Item = items!.First();

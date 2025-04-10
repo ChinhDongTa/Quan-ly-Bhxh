@@ -13,7 +13,6 @@ namespace ApiGateway.Controllers.Human;
 
 [Route("[controller]")]
 [ApiController]
-[Authorize]
 public class EmployeesController(BhxhDbContext context, IGenericDapper dapper) : ControllerBase {
 
     // GET: api/Employees
@@ -56,7 +55,7 @@ public class EmployeesController(BhxhDbContext context, IGenericDapper dapper) :
     {
         var employee = await context.Employees.Include(x => x.SalaryCoefficient)
             .Include(x => x.Dept).Include(x => x.Post)
-                                .FirstOrDefaultAsync(x => x.EmployeeId == id);
+                                .FirstOrDefaultAsync(x => x.Id == id);
 
         return Ok(ResultExtension.GetResult(employee?.ToDto()));
     }
@@ -108,7 +107,7 @@ public class EmployeesController(BhxhDbContext context, IGenericDapper dapper) :
                 .Include(s => s.Dept)
                 .AsSplitQuery()
                 .OrderBy(s => s.FirstName).ThenBy(s => s.LastName)
-                .Select(s => new EmployeeDtoForListBox(s.EmployeeId, $"{s.FirstName} {s.LastName}-{s.Dept!.ShortName}"))
+                .Select(s => new EmployeeDtoForListBox(s.Id, $"{s.FirstName} {s.LastName}-{s.Dept!.ShortName}"))
                 .ToListAsync();
             //FormattableString query = ;
 
@@ -120,7 +119,7 @@ public class EmployeesController(BhxhDbContext context, IGenericDapper dapper) :
                 .Include(s => s.Dept)
                 .AsSplitQuery()
                 .OrderBy(s => s.FirstName).ThenBy(s => s.LastName)
-                .Select(s => new EmployeeDtoForListBox(s.EmployeeId, $"{s.FirstName} {s.LastName}-{s.Dept!.ShortName}"))
+                .Select(s => new EmployeeDtoForListBox(s.Id, $"{s.FirstName} {s.LastName}-{s.Dept!.ShortName}"))
                 .ToListAsync();
             //FormattableString query = ;
             return Ok(ResultExtension.GetResult(result));
@@ -132,7 +131,7 @@ public class EmployeesController(BhxhDbContext context, IGenericDapper dapper) :
     [HttpPut(ActionBase.Update + "/{id}")]
     public async Task<IActionResult> Update(int id, EmployeeDto dto)
     {
-        if (id != dto.EmployeeId)
+        if (id != dto.Id)
         {
             return Ok(Result<bool>.Failure(DongTa.ResponseMessage.Message.Notfound));
         }
@@ -185,6 +184,6 @@ public class EmployeesController(BhxhDbContext context, IGenericDapper dapper) :
 
     private bool EmployeeExists(int id)
     {
-        return context.Employees.Any(e => e.EmployeeId == id);
+        return context.Employees.Any(e => e.Id == id);
     }
 }

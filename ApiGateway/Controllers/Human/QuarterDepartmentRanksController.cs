@@ -17,7 +17,6 @@ namespace ApiGateway.Controllers.Human;
 
 [Route("[controller]")]
 [ApiController]
-[Authorize]
 public class QuarterDepartmentRanksController(BhxhDbContext context, IGenericDapper dapper) : ControllerBase {
 
     // GET: QuarterDepartmentRanks
@@ -64,7 +63,7 @@ public class QuarterDepartmentRanksController(BhxhDbContext context, IGenericDap
     [HttpPut(ActionBase.Update + "/{id}")]
     public async Task<IActionResult> Update(int id, QuarterDepartmentRankDto dto)
     {
-        if (id != dto.QuarterDepartmentRankId)
+        if (id != dto.Id)
         {
             return Ok(Result<bool>.Failure(InfoMessage.InvalidId(nameof(QuarterDepartmentRankDto))));
         }
@@ -105,7 +104,7 @@ public class QuarterDepartmentRanksController(BhxhDbContext context, IGenericDap
         }
         catch (DbUpdateException)
         {
-            if (QuarterDepartmentRankExists(quarterDepartmentRank.QuarterDepartmentRankId))
+            if (QuarterDepartmentRankExists(quarterDepartmentRank.Id))
             {
                 return Ok(Result<bool>.Failure("Conflict !"));
             }
@@ -132,6 +131,6 @@ public class QuarterDepartmentRanksController(BhxhDbContext context, IGenericDap
 
     private bool QuarterDepartmentRankExists(int id)
     {
-        return context.QuarterDepartmentRanks.Any(e => e.QuarterDepartmentRankId == id);
+        return context.QuarterDepartmentRanks.Any(e => e.Id == id);
     }
 }

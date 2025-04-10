@@ -1,7 +1,7 @@
 ﻿namespace DataServices.Entities.Human;
 
 public partial class QuarterEmployeeRank {
-    public int QuarterEmployeeRankId { get; set; }
+    public int Id { get; set; }
 
     public int EmployeeId { get; set; }
 

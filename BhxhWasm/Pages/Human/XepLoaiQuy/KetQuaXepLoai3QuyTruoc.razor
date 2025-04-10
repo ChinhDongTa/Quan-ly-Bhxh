@@ -1,0 +1,30 @@
+﻿
+@* Kết quả xếp loại cá nhân 3 quý trước quý hiện tại *@
+@inject IHttpClientBase client
+
+
+@if (dto is null)
+{
+    <FluentProgressRing />
+}
+else
+{
+    <div>
+        @dto.TotalReward
+    </div>
+}
+
+@code {
+    [Parameter] public int EmployeeId { get; set; }
+    private Result3QuarterEmployeeRankDto? dto;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var result = await client.GetAsync<ResultDto<Result3QuarterEmployeeRankDto>>(QuarterEmployeeRankApiRoute.Get3QuarterBeforeByEmployeeId(EmployeeId));
+        if (result != null && result.IsSuccess)
+            dto = result.Dto;
+        //StateHasChanged();
+
+    }
+}

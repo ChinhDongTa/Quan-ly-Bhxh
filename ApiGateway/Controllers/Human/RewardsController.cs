@@ -10,7 +10,6 @@ namespace ApiGateway.Controllers.Human;
 
 [Route("[controller]")]
 [ApiController]
-[Authorize]
 public class RewardsController(BhxhDbContext context) : ControllerBase {
 
     // GET: api/Rewards

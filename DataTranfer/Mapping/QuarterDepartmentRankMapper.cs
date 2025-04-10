@@ -9,7 +9,7 @@ public static class QuarterDepartmentRankMapper {
     {
         return new()
         {
-            QuarterDepartmentRankId = quarterDepartmentRank.QuarterDepartmentRankId,
+            Id = quarterDepartmentRank.Id,
             DeptId = quarterDepartmentRank.DeptId,
             DeptName = quarterDepartmentRank.Dept?.Name,
             RewardId = quarterDepartmentRank.RewardId,
@@ -29,7 +29,7 @@ public static class QuarterDepartmentRankMapper {
         {
             return new()
             {
-                QuarterDepartmentRankId = dto.QuarterDepartmentRankId,
+                Id = dto.Id,
                 DeptId = dto.DeptId,
                 RewardId = dto.RewardId,
                 Quarter = dto.Quarter,

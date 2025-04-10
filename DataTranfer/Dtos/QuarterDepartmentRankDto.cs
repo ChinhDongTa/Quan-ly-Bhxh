@@ -1,7 +1,7 @@
 ﻿namespace DataTranfer.Dtos;
 
 public record QuarterDepartmentRankDto {
-    public int QuarterDepartmentRankId { get; set; }
+    public int Id { get; set; }
 
     public int DeptId { get; set; }
     public string? DeptName { get; set; }

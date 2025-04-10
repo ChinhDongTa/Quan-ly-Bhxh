@@ -1,7 +1,7 @@
 ﻿namespace DataServices.Entities.Human;
 
 public partial class Employee {
-    public int EmployeeId { get; set; }
+    public int Id { get; set; }
 
     public string? Email { get; set; }
 

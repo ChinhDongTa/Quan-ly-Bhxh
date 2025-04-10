@@ -9,7 +9,7 @@ public static class SalaryCoefficientMapper {
     {
         return new()
         {
-            SalaryCoefficientId = salaryCoefficient.SalaryCoefficientId,
+            Id = salaryCoefficient.Id,
             Name = salaryCoefficient.Name,
             Description = salaryCoefficient.Description
         };
@@ -21,7 +21,7 @@ public static class SalaryCoefficientMapper {
         {
             return new()
             {
-                SalaryCoefficientId = dto.SalaryCoefficientId,
+                Id = dto.Id,
                 Name = dto.Name,
                 Description = dto.Description
             };

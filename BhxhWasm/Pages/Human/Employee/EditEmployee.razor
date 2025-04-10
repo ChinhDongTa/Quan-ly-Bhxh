@@ -15,7 +15,7 @@
                 <AlertMessage Message="@Message" />
                 <FluentGrid>
                     <FluentGridItem>
-                        <FluentTextField Label="Họ" @bind-Value="@employeeDto.FirstName" />
+                        <FluentTextField Label="Họ và tên lót" @bind-Value="@employeeDto.FirstName" />
                         <FluentTextField Label="Tên" @bind-Value="@employeeDto.LastName" />
                         <FluentDatePicker @bind-Value="ngaySinh" Label="Ngày sinh"   DayFormat="DayFormat.TwoDigit" Culture="@(System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))" />
                         <FluentTextField Label="Số căn cước" @bind-Value="@employeeDto.IdentityCard" />
@@ -54,10 +54,9 @@
     SalaryCoefficientDto? scSelected;
     //byte quarter;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
-        {
+       
             if (EmployeeId > 0)
             {
                 var result = await client.GetAsync<ResultDto<EmployeeDto>>(EmployeeApiRoute.GetOne(EmployeeApiRoute.ControllerName, EmployeeId));
@@ -71,8 +70,8 @@
             {
                 employeeDto = new() { PostId = 10, Birthdate = DateTime.Now.AddYears(-24) };
             }
-            StateHasChanged();
-        }
+            //StateHasChanged();
+        
     }
 
     async void SaveStaffBtn()
@@ -86,7 +85,7 @@
                 canPost = false;
             }
             else
-                employeeDto.PostId = posSelected.PositionId;
+                employeeDto.PostId = posSelected.Id;
 
             if (deptSelected is null)
             {
@@ -94,13 +93,13 @@
                 canPost = false;
             }
             else
-                employeeDto.DeptId = deptSelected.DepartmentId;
+                employeeDto.DeptId = deptSelected.Id;
             if (scSelected is null)
             {
                 errors?.Add(InfoMessage.Unselect("hệ số lương"));
             }
             else
-                employeeDto.SalaryCoefficientId = scSelected.SalaryCoefficientId;
+                employeeDto.SalaryCoefficientId = scSelected.Id;
 
             if (canPost)
             {

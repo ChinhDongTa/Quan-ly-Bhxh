@@ -9,7 +9,7 @@ public static class DepartmentMapper {
     {
         return new()
         {
-            DepartmentId = department.DepartmentId,
+            Id = department.Id,
             Name = department.Name,
             ShortName = department.ShortName,
             Email = department.Email,
@@ -28,7 +28,7 @@ public static class DepartmentMapper {
         {
             return new()
             {
-                DepartmentId = dto.DepartmentId,
+                Id = dto.Id,
                 Name = dto.Name,
                 ShortName = dto.ShortName,
                 Email = dto.Email,

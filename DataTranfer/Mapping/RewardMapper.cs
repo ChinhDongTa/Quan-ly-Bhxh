@@ -9,7 +9,7 @@ public static class RewardMapper {
     {
         return new()
         {
-            RewardId = reward.RewardId,
+            Id = reward.Id,
             Name = reward.Name,
             ShortName = reward.ShortName,
             Classify = reward.Classify,

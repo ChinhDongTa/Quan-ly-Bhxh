@@ -1,0 +1,83 @@
+﻿@page "/Human/XeploaiQuy/BinhXetCaNhan"
+@inject IHttpClientBase client
+
+<AuthorizeView Roles="tccb,admin">
+    <Authorized>
+        <LabelHeader Text="Bình xét xếp loại quý cá nhân của đơn vị" />
+        <AlertMessage Message="@message" />
+        <FluentGrid>
+            <FluentGridItem>
+                <FluentNumberField @bind-Value=quarter Label="Quý" />
+            </FluentGridItem>
+            <FluentGridItem>
+                <FluentNumberField @bind-Value=year Label="Năm" />
+            </FluentGridItem>
+            <FluentGridItem>
+                <SelectListDepartment @bind-Item="deptDto" WithBGD="true" />
+            </FluentGridItem>
+            <FluentGridItem>
+                <FluentButton IconStart="@(new Icons.Regular.Size20.Search())" Appearance="Appearance.Accent" Style="margin-top:24px" @onclick="GetList">@ConstName.BtnSearch</FluentButton>
+            </FluentGridItem>
+
+        </FluentGrid>
+
+        <div style="margin-top:20px">
+            @if (list is null)
+            {
+                <LoadPage />
+            }
+            else
+            {
+                <DetailTable Items="list" />
+            }
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <AlertMessage Message=@InfoMessage.NotAuthorized />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    IEnumerable<QuarterEmployeeRankDto>? list = Enumerable.Empty<QuarterEmployeeRankDto>();
+    string? message = null;
+    int year, quarter;
+    IList<string>? errors = new List<string>();
+    DepartmentDto? deptDto = null;
+    //bool isInit;
+
+    protected override void OnParametersSet()
+    {
+        var now = DateTime.Now.AddDays(ReadOnlyValue.SubDay);
+        year = now.Year;
+        quarter = DateTimeExtension.GetCurrentQuarter(now.Month);
+    }
+
+    async Task GetList()
+    {
+        list = null;
+        //await Task.Delay(600);
+        //StateHasChanged(); // ko cân
+        if (deptDto is null)
+        {
+            errors?.Add(InfoMessage.Unselect("đơn vị"));
+            list = Enumerable.Empty<QuarterEmployeeRankDto>();
+        }
+        else
+        {
+            var result = await client.GetAsync<ResultDto<QuarterEmployeeRankDto>>(QuarterEmployeeRankApiRoute.GetByDeptIdAndQuarter(deptDto.Id, (byte)quarter, year));
+          
+            if (result !=null &&result.IsSuccess)
+            {
+                list = result.Dtos;
+                //var dept = (await client.GetAsync<ResultDto<DepartmentDto>>(DepartmentApiRoute.GetOneByEmployeeId(one.EmployeeId)))?.Dto;
+            }
+            else
+            {
+                errors?.Add(InfoMessage.DownloadFailed);
+                list = Enumerable.Empty<QuarterEmployeeRankDto>();
+            }
+        }
+        message = errors.ToErrorString();
+        //StateHasChanged();
+    }
+}

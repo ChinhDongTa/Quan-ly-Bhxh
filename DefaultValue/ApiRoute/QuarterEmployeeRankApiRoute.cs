@@ -3,8 +3,8 @@
 public record QuarterEmployeeRankApiRoute : ActionRouteBase {
     public const string ControllerName = "QuarterEmployeeRanks";
 
-    public static string GetByQuarter(byte quarter, int year) =>
-        $"{ControllerName}/GetByQuarter/{quarter}/{year}";
+    public static string GetByDeptIdAndQuarter(int deptId, byte quarter, int year) =>
+        $"{ControllerName}/GetByDeptIdAndQuarter/{deptId}/{quarter}/{year}";
     public static string GetCurrentByUserId(string userId) =>
        $"{ControllerName}/GetCurrentByUserId/{userId}";
 

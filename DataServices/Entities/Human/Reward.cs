@@ -1,7 +1,7 @@
 ﻿namespace DataServices.Entities.Human;
 
 public partial class Reward {
-    public int RewardId { get; set; }
+    public int Id { get; set; }
 
     public string Name { get; set; } = null!;
 

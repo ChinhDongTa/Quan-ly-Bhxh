@@ -6,7 +6,6 @@ public record InfoMessage {
     public static string DownloadSuccess => "Tải file thành công !";
     public static string Success => "Success: Đã xử lí thành công";
     public static string Unselect(string name) => $"Error: Chưa chọn {name}";
-    public static string ApiCallFailed(string name) => $"Error: Lỗi khi lấy đối tượng '{name}'";
     public static string ObjectNull(string objName) => $"Error, {objName} is null";
     public static string NotAuthorized => "Warning: tài khoản của bạn không thể vào chức năng này!";
     public static string NotFound => "Warning, không tìm thấy kết quả";

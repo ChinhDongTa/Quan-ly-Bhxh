@@ -14,7 +14,6 @@ namespace ApiGateway.Controllers.Human;
 
 [Route("[controller]")]
 [ApiController]
-[Authorize]
 public class DepartmentsController(BhxhDbContext context, IGenericDapper dapper) : ControllerBase {
 
     // GET: Departments/All
@@ -47,7 +46,7 @@ public class DepartmentsController(BhxhDbContext context, IGenericDapper dapper)
     [HttpPut(ActionBase.Update + "/{id}")]
     public async Task<IActionResult> Update(int id, DepartmentDto department)
     {
-        if (id != department.DepartmentId)
+        if (id != department.Id)
         {
             return Ok(Result<bool>.Failure(InfoMessage.InvalidId(nameof(Department))));
         }
@@ -101,6 +100,6 @@ public class DepartmentsController(BhxhDbContext context, IGenericDapper dapper)
 
     private bool DepartmentExists(int id)
     {
-        return context.Departments.Any(e => e.DepartmentId == id);
+        return context.Departments.Any(e => e.Id == id);
     }
 }

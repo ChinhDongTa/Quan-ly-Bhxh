@@ -35,10 +35,10 @@ else if (Items.HasItems())
 
                     </td>
                     <td>
-                        <FluentAnchor IconEnd="@(new Icons.Regular.Size16.PreviewLink())" Href=@($"/Human/Employee/Details/QtktDetail/{item.EmployeeId}")>@ConstName.Detail)</FluentAnchor>
+                        <FluentAnchor IconEnd="@(new Icons.Regular.Size16.PreviewLink())" Href=@($"/Human/Employee/Details/QtktDetail/{item.Id}")>@ConstName.Detail)</FluentAnchor>
                     </td>
                     <td>
-                        <LinkEdit Url=@($"/Human/Employee/EditEmployee/{item.EmployeeId}") Text="@ConstName.Edit" />
+                        <LinkEdit Url=@($"/Human/Employee/EditEmployee/{item.Id}") Text="@ConstName.Edit" />
                     </td>
                 </tr>
             }

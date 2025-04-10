@@ -2,12 +2,10 @@
 using DataTranfer.Dtos;
 using DefaultValue;
 using DefaultValue.ApiRoute;
-
 using DongTa.ResponseMessage;
 using DongTa.ResponseResult;
 using HttpClientBase;
 using Microsoft.AspNetCore.Components.Authorization;
-using System.Net.Http.Json;
 using System.Security.Claims;
 
 namespace BhxhWasm.Services;
@@ -23,7 +21,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
         var accessToken = LocalStorage.GetItem<string>("accessToken");
         if (accessToken != null)
         {
-            client.SetAuthorizationHeaderAsync(accessToken);
+            client.SetAuthorizationHeader(accessToken);
             //new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
         }
     }
@@ -38,6 +36,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
             {
                 var claims = new List<Claim>
                 {
+                    new(ClaimTypes.NameIdentifier, result.Dto.Id),
                     new(ClaimTypes.Name, result.Dto.Username),
                     new(ClaimTypes.Email, result.Dto.Email),
                     new(ClaimTypes.Role, result.Dto.RoleName)
@@ -69,18 +68,13 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
                 LocalStorage.SetItem("accessToken", response.AccessToken);
                 LocalStorage.SetItem("refreshToken", response.RefreshToken);
                 LocalStorage.SetItem("expiresIn", response.ExpiresIn.ToString());
-                // Store token
-                //message = "Login successful!";
-                //Navigation.NavigateTo("/"); // Redirect to home
-                client.SetAuthorizationHeaderAsync(response.AccessToken);
-
+                client.SetAuthorizationHeader(response.AccessToken);
                 NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
                 return new Result<bool>(true, InfoMessage.ActionSuccess(ConstName.Login));
             }
             else
             {
-                return new Result<bool>(false, InfoMessage.EmailOrPasswordInvalid)
-               ;
+                return new Result<bool>(false, InfoMessage.EmailOrPasswordInvalid);
             }
         }
         catch (Exception ex)
@@ -96,7 +90,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
         LocalStorage.RemoveItem("accessToken");
         LocalStorage.RemoveItem("refreshToken");
         LocalStorage.RemoveItem("expiresIn");
-        client.SetAuthorizationHeaderAsync("");
+        client.SetAuthorizationHeader();
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 

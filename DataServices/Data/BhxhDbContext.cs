@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataServices.Data;
 
+//DbContextOptions<BhxhDbContext> options
 public class BhxhDbContext(DbContextOptions<BhxhDbContext> options) : IdentityDbContext<ApiUser>(options) {
     public virtual DbSet<Department> Departments { get; set; }
 

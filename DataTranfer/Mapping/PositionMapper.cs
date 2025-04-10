@@ -9,7 +9,7 @@ public static class PositionMapper {
     {
         return new()
         {
-            PositionId = position.PositionId,
+            Id = position.Id,
             Name = position.Name,
             ShortName = position.ShortName
         };
@@ -21,7 +21,7 @@ public static class PositionMapper {
         {
             return new()
             {
-                PositionId = dto.PositionId,
+                Id = dto.Id,
                 Name = dto.Name,
                 ShortName = dto.ShortName
             };
