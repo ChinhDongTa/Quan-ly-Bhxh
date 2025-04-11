@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DefaultValue", "DefaultValu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpClientBase", "HttpClientBase\HttpClientBase.csproj", "{3FB96E1E-B431-4510-AF78-A56687C5AC91}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dtos", "Dtos\Dtos.csproj", "{02A249E1-B033-411A-9461-DFF4D2A83435}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{3FB96E1E-B431-4510-AF78-A56687C5AC91}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FB96E1E-B431-4510-AF78-A56687C5AC91}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FB96E1E-B431-4510-AF78-A56687C5AC91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02A249E1-B033-411A-9461-DFF4D2A83435}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02A249E1-B033-411A-9461-DFF4D2A83435}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02A249E1-B033-411A-9461-DFF4D2A83435}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02A249E1-B033-411A-9461-DFF4D2A83435}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -70,6 +76,7 @@ Global
 		{E8FF238F-828B-497E-88E0-DC6B7766C674} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{D136C195-E1AF-44A9-A095-07A200A291E4} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{3FB96E1E-B431-4510-AF78-A56687C5AC91} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{02A249E1-B033-411A-9461-DFF4D2A83435} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {27823B27-A958-453A-8589-86EF54F93944}

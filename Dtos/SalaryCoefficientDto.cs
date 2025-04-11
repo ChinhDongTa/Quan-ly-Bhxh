@@ -1,4 +1,4 @@
-﻿namespace DataTranfer.Dtos;
+﻿namespace Dtos;
 
 public record SalaryCoefficientDto {
     public int Id { get; set; }

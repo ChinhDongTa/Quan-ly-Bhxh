@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DataTranfer\DataTranfer.csproj" />
     <ProjectReference Include="..\DefaultValue\DefaultValue.csproj" />
+    <ProjectReference Include="..\Dtos\Dtos.csproj" />
     <ProjectReference Include="..\HttpClientBase\HttpClientBase.csproj" />
   </ItemGroup>
 

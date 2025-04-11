@@ -1,4 +1,4 @@
-﻿namespace DataTranfer.Parameter;
+﻿namespace Dtos.Parameter;
 
 /// <summary>
 /// Tham số cho báo cáo xếp loại và tiền thưởng quý

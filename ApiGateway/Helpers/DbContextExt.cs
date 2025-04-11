@@ -1,6 +1,6 @@
 ﻿using DataServices.Data;
 using DataServices.Entities.Human;
-using DataTranfer.Dtos;
+using Dtos;
 using DataTranfer.Mapping;
 using DefaultValue;
 using DongTa.BaseDapper;
@@ -30,19 +30,17 @@ public static class DbContextExt {
         {
             return result;
         }
-        else//khởi tạo xếp loại tất cả đơn vị cho quý hiện tại
+        else//khởi tạo xếp loại đơn vị cho quý hiện tại
         {
-            foreach (var dept in context.Departments)
+            var quarterDepartmentRank = new QuarterDepartmentRank
             {
-                var quarterDepartmentRank = new QuarterDepartmentRank
-                {
-                    DeptId = dept.Id,
-                    Quarter = current.Quarter,
-                    Year = current.Year,
-                    RewardId = 22// loại A
-                };
-                context.QuarterDepartmentRanks.Add(quarterDepartmentRank);
-            }
+                DeptId = deptId,
+                Quarter = current.Quarter,
+                Year = current.Year,
+                RewardId = 20// loại A
+            };
+            context.QuarterDepartmentRanks.Add(quarterDepartmentRank);
+
             await context.SaveChangesAsync();
 
             return await context.QuarterDepartmentRanks

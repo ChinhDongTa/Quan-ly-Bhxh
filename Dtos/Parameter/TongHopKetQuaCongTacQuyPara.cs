@@ -1,4 +1,4 @@
-﻿namespace DataTranfer.Parameter;
+﻿namespace Dtos.Parameter;
 
 /// <summary>
 /// Tổng hợp kết quả công tác quý của công chức, viên chức

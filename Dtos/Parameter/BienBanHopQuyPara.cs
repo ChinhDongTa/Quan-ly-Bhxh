@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DataTranfer.Parameter;
+﻿namespace Dtos.Parameter;
 /// <summary>
 /// Tham số biên bản họp quý
 /// </summary>

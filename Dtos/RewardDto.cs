@@ -1,4 +1,4 @@
-﻿namespace DataTranfer.Dtos;
+﻿namespace Dtos;
 
 public record RewardDto {
     public int Id { get; set; }

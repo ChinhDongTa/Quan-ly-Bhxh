@@ -1,5 +1,5 @@
 ﻿using DataServices.Entities.Human;
-using DataTranfer.Dtos;
+using Dtos;
 using DongTa.BaseDapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

@@ -1,10 +1,9 @@
-﻿namespace DataTranfer.Dtos;
+﻿namespace Dtos;
 
-public record QuarterDepartmentRankDto {
+public record QuarterEmployeeRankDto {
     public int Id { get; set; }
-
-    public int DeptId { get; set; }
-    public string? DeptName { get; set; }
+    public int EmployeeId { get; set; }
+    public string? EmployeeName { get; set; }
     public int RewardId { get; set; }
     public string? RewardName { get; set; }
     public byte Quarter { get; set; }
@@ -14,9 +13,10 @@ public record QuarterDepartmentRankDto {
     public int? SelfScore { get; set; }
 
     public int? ResultScore { get; set; }
-    /// <summary>
-    /// Điểm cơ sở năm ở bảng Department
-    /// </summary>
-    public int BaseCore { get; set; }
+
+    public int? TotalWork { get; set; }
+
+    public int? NumWorked { get; set; }
+
     public string? Note { get; set; }
 }

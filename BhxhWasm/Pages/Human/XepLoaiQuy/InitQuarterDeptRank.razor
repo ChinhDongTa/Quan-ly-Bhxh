@@ -1,0 +1,40 @@
+﻿
+@if(Item.Id>0)
+{
+    <FluentAnchor IconEnd="@(new Icons.Regular.Size16.Edit())" Href="@($"/Human/XepLoaiQuy/EditDonVi/{Item.Id}")">@Text</FluentAnchor>
+}
+else
+{
+    if(!created)
+    {
+        <FluentButton IconStart="@(new Icons.Regular.Size20.Edit())" Appearance="Appearance.Accent" @onclick="InitBtn">@btnText</FluentButton>
+    }
+    else
+    {
+        <p> @(btnText = "Đã tạo xong")</p>
+    }
+
+}
+@inject IHttpClientBase client
+@code {
+    [Parameter] public QuarterDepartmentRankDto Item { get; set; } = new();
+    
+    string Text { get; set; } = ConstName.Edit;
+    string btnText { get; set; } = "Tạo mới";
+    bool created = false;
+    async Task InitBtn()
+    {
+        //dto = new ()  { Id=Id, DeptId=DeptId, Quarter=(byte)Quarter };
+        Item.RewardId = 20;
+        var result = await client.PostAsync<QuarterDepartmentRankDto, ResultDto<bool>>(QuarterDepartmentRankApiRoute.Create(QuarterDepartmentRankApiRoute.ControllerName), Item!);
+        if (result != null && result.IsSuccess)
+        {
+            btnText = ConstName.Edit;
+            created = true;
+        }
+        else
+        {
+            btnText = InfoMessage.PostFailed;
+        }
+    }
+}

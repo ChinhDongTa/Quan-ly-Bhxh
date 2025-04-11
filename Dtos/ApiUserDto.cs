@@ -1,3 +1,3 @@
-﻿namespace DataTranfer.Dtos;
+﻿namespace Dtos;
 
 public record ApiUserDto(string Id, string UserName, string Roles, int EmployeeId);

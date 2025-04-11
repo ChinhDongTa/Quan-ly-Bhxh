@@ -1,4 +1,4 @@
-﻿namespace DataTranfer.Dtos;
+﻿namespace Dtos;
 
 public record InfoDto {
     public string Id { get; set; } = string.Empty;

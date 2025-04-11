@@ -1,11 +1,11 @@
 ﻿using ApiGateway.Controllers.File.Models;
 using ApiGateway.Helpers;
 using DataServices.Data;
-using DataTranfer.Dtos;
 using DataTranfer.Mapping;
-using DataTranfer.Parameter;
+using Dtos.Parameter;
 using DongTa.QuarterInYear;
 using DongTa.TypeExtension;
+using Dtos;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiGateway.Controllers.File.Rdlcs;

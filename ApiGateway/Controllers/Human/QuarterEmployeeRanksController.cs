@@ -1,7 +1,7 @@
 ﻿using ApiGateway.Helpers;
 using DataServices.Data;
 using DataServices.Entities.Human;
-using DataTranfer.Dtos;
+using Dtos;
 using DataTranfer.Mapping;
 using DefaultValue;
 using DefaultValue.ApiRoute;

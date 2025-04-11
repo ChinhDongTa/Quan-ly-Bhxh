@@ -1,4 +1,4 @@
-﻿namespace DataTranfer.Dtos;
+﻿namespace Dtos;
 
 public record RefreshTokenRequestDto {
     public Guid UserId { get; set; }

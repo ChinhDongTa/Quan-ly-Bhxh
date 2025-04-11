@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DataTranfer.Dtos;
+namespace Dtos;
 
 public record LoginDto {
     [Required]

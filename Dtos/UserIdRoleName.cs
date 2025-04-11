@@ -1,4 +1,4 @@
-﻿namespace DataTranfer.Dtos;
+﻿namespace Dtos;
 
 public record UserIdRoleName {
     public string UserId { get; set; } = string.Empty;

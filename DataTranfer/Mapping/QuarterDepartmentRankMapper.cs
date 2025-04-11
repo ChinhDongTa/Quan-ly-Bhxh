@@ -1,5 +1,5 @@
 ﻿using DataServices.Entities.Human;
-using DataTranfer.Dtos;
+using Dtos;
 
 namespace DataTranfer.Mapping;
 

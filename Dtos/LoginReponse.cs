@@ -1,4 +1,4 @@
-﻿namespace DataTranfer.Dtos;
+﻿namespace Dtos;
 
 public record LoginReponse {
     public string TokenType { get; set; } = string.Empty;

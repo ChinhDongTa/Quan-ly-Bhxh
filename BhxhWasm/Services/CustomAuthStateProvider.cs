@@ -1,5 +1,5 @@
 ﻿using Blazored.LocalStorage;
-using DataTranfer.Dtos;
+using Dtos;
 using DefaultValue;
 using DefaultValue.ApiRoute;
 using DongTa.ResponseMessage;

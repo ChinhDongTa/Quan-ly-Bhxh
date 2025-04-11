@@ -1,4 +1,4 @@
-﻿namespace DataTranfer.Dtos;
+﻿namespace Dtos;
 
 /// <summary>
 /// Kết quả xếp loại của 3 quý trước

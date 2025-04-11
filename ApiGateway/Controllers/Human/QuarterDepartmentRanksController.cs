@@ -1,17 +1,16 @@
-﻿using DataServices.Data;
-using DataTranfer.Dtos;
+﻿using ApiGateway.Helpers;
+using DataServices.Data;
+using DataServices.Entities.Human;
+using Dtos;
+using DataTranfer.Mapping;
 using DefaultValue;
 using DefaultValue.ApiRoute;
 using DongTa.BaseDapper;
-using DongTa.ResponseResult;
-using DataTranfer.Mapping;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DataServices.Entities.Human;
 using DongTa.QuarterInYear;
 using DongTa.ResponseMessage;
-using ApiGateway.Helpers;
-using Microsoft.AspNetCore.Authorization;
+using DongTa.ResponseResult;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiGateway.Controllers.Human;
 
@@ -24,9 +23,35 @@ public class QuarterDepartmentRanksController(BhxhDbContext context, IGenericDap
     public async Task<IActionResult> GetByQuarter(byte q, int year)
     {
         var quarter = new QuarterInYear(q, year);
-        return Ok(ResultExtension.GetResult(await context.QuarterDepartmentRanks
+        var list = await context.QuarterDepartmentRanks
             .Where(x => x.Quarter == q && x.Year == year)
-            .Select(x => x.ToDto()).ToListAsync()));
+            .Include(x => x.Dept).Include(x => x.Reward)
+            .Select(x => x.ToDto()).ToListAsync();
+        //var deptIds = await dapper.GetByQueryAsync<int>("select Id, ShortName from Departments where IsActivity = 1");
+        var dept = await context.Departments.Where(x => x.IsActivity == true).ToListAsync();
+
+        foreach (var item in dept!)
+        {
+            var existDepId = list.Any(x => x.DeptId == item.Id);
+            if (existDepId is false)
+            {
+                list.Add(new QuarterDepartmentRankDto
+                {
+                    Id = 0,
+                    DeptId = item.Id,
+                    DeptName = item.Name,
+                    RewardId = 0,
+                    RewardName = "",
+                    Quarter = q,
+                    Year = year,
+                    SelfScore = 0,
+                    ResultScore = 0,
+                    BaseCore = 0,
+                    Note = ""
+                });
+            }
+        }
+        return Ok(ResultExtension.GetResult(list));
     }
 
     /// <summary>
@@ -88,23 +113,24 @@ public class QuarterDepartmentRanksController(BhxhDbContext context, IGenericDap
                 throw;
             }
         }
-
         return Ok(Result<bool>.Failure(Message.None));
     }
 
     // POST: api/QuarterDepartmentRanks
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost(ActionBase.Create)]
-    public async Task<IActionResult> Create(QuarterDepartmentRank quarterDepartmentRank)
+    public async Task<IActionResult> Create(QuarterDepartmentRankDto dto)
     {
-        context.QuarterDepartmentRanks.Add(quarterDepartmentRank);
+        if (dto.RewardId == 0)
+            dto.RewardId = 20;
+        context.QuarterDepartmentRanks.Add(dto.ToEntity());
         try
         {
             return Ok(Result<bool>.BoolResult(await context.SaveChangesAsync() > 0));
         }
         catch (DbUpdateException)
         {
-            if (QuarterDepartmentRankExists(quarterDepartmentRank.Id))
+            if (QuarterDepartmentRankExists(dto.Id))
             {
                 return Ok(Result<bool>.Failure("Conflict !"));
             }

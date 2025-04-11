@@ -1,5 +1,5 @@
 ﻿using DataServices.Data;
-using DataTranfer.Dtos;
+using Dtos;
 using DefaultValue;
 using DefaultValue.ApiRoute;
 using DongTa.BaseDapper;

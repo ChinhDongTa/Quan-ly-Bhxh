@@ -1,5 +1,4 @@
-﻿@page "/Human/XepLoaiQuy/DonVi"
-
+﻿@page "/Human/XepLoaiQuy/BinhXetDonVi"
 @inject IHttpClientBase client
 
 <AuthorizeView Roles="tccb,admin">
@@ -17,7 +16,6 @@
                 <FluentButton IconStart="@(new Icons.Regular.Size20.Search())" Appearance="Appearance.Accent" Style="margin-top:24px" @onclick="GetList"></FluentButton>
             </FluentGridItem>
         </FluentGrid>
-
         @if (dtos is null)
         {
             <LoadPage />
@@ -27,6 +25,7 @@
             <table class="bordered">
                 <thead>
                     <tr>
+                        <th>Stt</th>
                         <th scope="col">Đơn vị</th>
                         <th scope="col">Kết quả</th>
                         <th scope="col">Điểm tự chấm</th>
@@ -39,6 +38,7 @@
                     @foreach (var item in dtos)
                     {
                         <tr>
+                            <td>@(stt++)</td>
                             <td>@item.DeptName</td>
                             <td>@item.RewardName</td>
                             <td>
@@ -51,7 +51,7 @@
                                 @item.Note
                             </td>
                             <td>
-                                <LinkEdit Text="@ConstName.Edit" Url=@($"Humanu/XepLoaiQuy/EditDonVi/{item.Id}") />
+                                <InitQuarterDeptRank Item="@item"/>
                             </td>
                         </tr>
                     }
@@ -66,26 +66,27 @@
 
 @code {
     IEnumerable<QuarterDepartmentRankDto>? dtos = Enumerable.Empty<QuarterDepartmentRankDto>();
+    //IEnumerable<DepartmentDto>? deptDto = null;
     string? message = null;
     int year, quarter;
-
-    protected override async void OnAfterRender(bool firstRender)
+    byte stt = 1;
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
-        {
-            var now = DateTime.Now.AddDays(ReadOnlyValue.SubDay);
-            quarter = DateTimeExtension.GetCurrentQuarter(now.Month);
-            year = now.Year;
-            dtos = await GetByTime(quarter, year);
-            //StateHasChanged();
-        }
+
+        var now = DateTime.Now.AddDays(ReadOnlyValue.SubDay);
+        quarter = DateTimeExtension.GetCurrentQuarter(now.Month);
+        year = now.Year;
+        dtos = await GetByTime(quarter, year);
+        //StateHasChanged();
+        //deptDto = (await client.GetAsync<ResultDto<DepartmentDto>>(DepartmentApiRoute.All(DepartmentApiRoute.ControllerName)))?.Dtos;
     }
 
     async Task GetList()
     {
+        stt = 1;
         dtos = null;
         dtos = await GetByTime(quarter, year);
-        StateHasChanged();
+        //StateHasChanged();
     }
 
     private async Task<IEnumerable<QuarterDepartmentRankDto>?> GetByTime(int quarter, int year)
@@ -93,7 +94,7 @@
         var result = (await client.GetAsync<ResultDto<QuarterDepartmentRankDto>>(QuarterDepartmentRankApiRoute.GetByQuarter((byte)quarter, year)))?.Dtos;
         if (result is null)
         {
-            message = InfoMessage.NotFound;
+            message = InfoMessage.ActionFailed("Lấy ds xếp loại quý đơn vị");
             return Enumerable.Empty<QuarterDepartmentRankDto>();
         }
         else
