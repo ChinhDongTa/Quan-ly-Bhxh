@@ -13,7 +13,7 @@
                 <FluentNumberField @bind-Value=year Label="Năm" />
             </FluentGridItem>
             <FluentGridItem>
-                <FluentButton IconStart="@(new Icons.Regular.Size20.Search())" Appearance="Appearance.Accent" Style="margin-top:24px" @onclick="GetList"></FluentButton>
+                <FluentButton IconStart="@(new Icons.Regular.Size20.Search())" Appearance="Appearance.Accent" Style="margin-top:24px" @onclick="GetListBtn"></FluentButton>
             </FluentGridItem>
         </FluentGrid>
         @if (dtos is null)
@@ -51,7 +51,7 @@
                                 @item.Note
                             </td>
                             <td>
-                                <InitQuarterDeptRank Item="@item"/>
+                                <InitQuarterDeptRank Item="item" GetListBtn="GetListBtn"/>
                             </td>
                         </tr>
                     }
@@ -81,7 +81,7 @@
         //deptDto = (await client.GetAsync<ResultDto<DepartmentDto>>(DepartmentApiRoute.All(DepartmentApiRoute.ControllerName)))?.Dtos;
     }
 
-    async Task GetList()
+    async Task GetListBtn()
     {
         stt = 1;
         dtos = null;

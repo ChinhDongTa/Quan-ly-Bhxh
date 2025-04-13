@@ -1,0 +1,47 @@
+﻿@page "/Human/Employee/Birthday"
+@inject IHttpClientBase client
+<AuthorizeView>
+    <Authorized>
+        <LabelHeader Text="Tra sinh nhật nhân viên" />
+        <AlertMessage Message="@message" />
+        <FluentGrid>
+            <FluentGridItem>
+               <FluentNumberField @bind-Value="@month" Label="Tháng sinh nhật" />
+            </FluentGridItem>
+            <FluentGridItem >
+                <FluentButton Appearance="Appearance.Accent" Style="margin-top:24px" @onclick="SearchBtn" IconStart="@(new Icons.Regular.Size20.Search())" />
+            </FluentGridItem>
+            <FluentCheckbox @bind-Value="@isAll" Style="margin-top:24px" Label="Cả tỉnh ?" />
+        </FluentGrid>
+
+        @if (items is null)
+        {
+            <LoadPage />
+        }
+        else if (items.HasItems())
+        {
+            <EmployeeList Items="items" />
+        }
+    </Authorized>
+    <NotAuthorized>
+        <AlertMessage Message=@InfoMessage.NotAuthorized />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    string? message;
+    IEnumerable<EmployeeDto>? items = Enumerable.Empty<EmployeeDto>();
+    int month=1;
+    bool isAll=false;
+    async Task SearchBtn()
+    {
+        //message = "Click search";
+        items = null;
+        var result = await client.GetAsync<ResultDto<EmployeeDto>>(EmployeeApiRoute.GetBirthdayInMonth(month, isAll));
+        if (result != null && result.IsSuccess && result.Dtos.HasItems())
+            items = result.Dtos!;
+        else 
+            message = result?.Message?.Description;
+        //StateHasChanged();
+    }
+}

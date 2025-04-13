@@ -13,4 +13,6 @@ public record EmployeeApiRoute : ActionRouteBase {
     public static string GetDeptHeadByUserId(string userId) => $"{ControllerName}/GetDeptHeadByUserId/{userId}";
     public static string GetEmployeeDto => $"{ControllerName}/GetEmployeeDto";
     public static string GetEmployeeDtoForListBox(string name = "All") => $"{ControllerName}/GetEmployeeDtoForListBox/{name}";
+    public static string GetBirthdayInMonth(int montf, bool isAll = false) =>
+        $"{ControllerName}/GetBirthdayInMonth/{montf}/{isAll}";
 }

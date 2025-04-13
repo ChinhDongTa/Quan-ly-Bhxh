@@ -1,4 +1,4 @@
-﻿namespace Dtos;
+﻿namespace Dtos.Human;
 
 public record SalaryCoefficientDto {
     public int Id { get; set; }

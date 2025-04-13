@@ -1,4 +1,4 @@
-﻿namespace Dtos;
+﻿namespace Dtos.Human;
 
 public record RoleDto {
     public string Id { get; set; } = string.Empty;

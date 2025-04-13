@@ -1,4 +1,4 @@
-﻿namespace Dtos;
+﻿namespace Dtos.Human;
 
 /// <summary>
 /// Kết quả xếp loại của 3 quý trước

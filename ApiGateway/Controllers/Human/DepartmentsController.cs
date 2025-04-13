@@ -1,6 +1,6 @@
 ﻿using DataServices.Data;
 using DataServices.Entities.Human;
-using Dtos;
+using Dtos.Human;
 using DefaultValue;
 using DefaultValue.ApiRoute;
 using DongTa.BaseDapper;

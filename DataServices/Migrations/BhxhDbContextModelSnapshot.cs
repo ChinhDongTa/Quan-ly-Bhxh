@@ -199,6 +199,42 @@ namespace DataServices.Migrations
                     b.ToTable("Employees");
                 });
 
+            modelBuilder.Entity("DataServices.Entities.Human.EventLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActionName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Browser")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EventLogs");
+                });
+
             modelBuilder.Entity("DataServices.Entities.Human.Level", b =>
                 {
                     b.Property<int>("Id")
@@ -216,7 +252,7 @@ namespace DataServices.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Level");
+                    b.ToTable("Levels");
                 });
 
             modelBuilder.Entity("DataServices.Entities.Human.Position", b =>
@@ -322,6 +358,44 @@ namespace DataServices.Migrations
                     b.HasIndex("RewardId");
 
                     b.ToTable("QuarterEmployeeRanks");
+                });
+
+            modelBuilder.Entity("DataServices.Entities.Human.QuarterScoreDept", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DeptId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("QuarterDeptRankId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Score1")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Score2")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Score3")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Score4")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeptId");
+
+                    b.HasIndex("QuarterDeptRankId");
+
+                    b.ToTable("QuarterScoreDepts");
                 });
 
             modelBuilder.Entity("DataServices.Entities.Human.Reward", b =>
@@ -552,6 +626,15 @@ namespace DataServices.Migrations
                     b.Navigation("SalaryCoefficient");
                 });
 
+            modelBuilder.Entity("DataServices.Entities.Human.EventLog", b =>
+                {
+                    b.HasOne("DataServices.Entities.Human.ApiUser", "User")
+                        .WithMany("EventLogs")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DataServices.Entities.Human.QuarterDepartmentRank", b =>
                 {
                     b.HasOne("DataServices.Entities.Human.Department", "Dept")
@@ -588,6 +671,25 @@ namespace DataServices.Migrations
                     b.Navigation("Employee");
 
                     b.Navigation("Reward");
+                });
+
+            modelBuilder.Entity("DataServices.Entities.Human.QuarterScoreDept", b =>
+                {
+                    b.HasOne("DataServices.Entities.Human.Department", "Dept")
+                        .WithMany("QuarterScoreDepts")
+                        .HasForeignKey("DeptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DataServices.Entities.Human.QuarterDepartmentRank", "QuarterDeptRank")
+                        .WithMany("QuarterScoreDepts")
+                        .HasForeignKey("QuarterDeptRankId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dept");
+
+                    b.Navigation("QuarterDeptRank");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -641,11 +743,18 @@ namespace DataServices.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("DataServices.Entities.Human.ApiUser", b =>
+                {
+                    b.Navigation("EventLogs");
+                });
+
             modelBuilder.Entity("DataServices.Entities.Human.Department", b =>
                 {
                     b.Navigation("Employees");
 
                     b.Navigation("QuarterDepartmentRanks");
+
+                    b.Navigation("QuarterScoreDepts");
                 });
 
             modelBuilder.Entity("DataServices.Entities.Human.Employee", b =>
@@ -663,6 +772,11 @@ namespace DataServices.Migrations
             modelBuilder.Entity("DataServices.Entities.Human.Position", b =>
                 {
                     b.Navigation("Employees");
+                });
+
+            modelBuilder.Entity("DataServices.Entities.Human.QuarterDepartmentRank", b =>
+                {
+                    b.Navigation("QuarterScoreDepts");
                 });
 
             modelBuilder.Entity("DataServices.Entities.Human.Reward", b =>

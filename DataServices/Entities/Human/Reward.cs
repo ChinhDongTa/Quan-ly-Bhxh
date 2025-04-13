@@ -11,7 +11,7 @@ public partial class Reward {
 
     public string? Classify { get; set; }
 
-    public virtual ICollection<QuarterDepartmentRank> QuarterDepartmentRanks { get; set; } = new List<QuarterDepartmentRank>();
+    public virtual ICollection<QuarterDepartmentRank>? QuarterDepartmentRanks { get; set; }
 
-    public virtual ICollection<QuarterEmployeeRank> QuarterEmployeeRanks { get; set; } = new List<QuarterEmployeeRank>();
+    public virtual ICollection<QuarterEmployeeRank>? QuarterEmployeeRanks { get; set; }
 }

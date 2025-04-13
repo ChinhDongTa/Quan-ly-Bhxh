@@ -1,36 +1,34 @@
-﻿
-@if(Item.Id>0)
+﻿@if(Item.Id>0)
 {
     <FluentAnchor IconEnd="@(new Icons.Regular.Size16.Edit())" Href="@($"/Human/XepLoaiQuy/EditDonVi/{Item.Id}")">@Text</FluentAnchor>
 }
 else
 {
-    if(!created)
-    {
-        <FluentButton IconStart="@(new Icons.Regular.Size20.Edit())" Appearance="Appearance.Accent" @onclick="InitBtn">@btnText</FluentButton>
-    }
-    else
-    {
-        <p> @(btnText = "Đã tạo xong")</p>
-    }
-
+    <FluentButton IconStart="@(new Icons.Regular.Size20.Edit())" Appearance="Appearance.Accent" @onclick="InitBtn">@btnText</FluentButton>
 }
+
 @inject IHttpClientBase client
 @code {
     [Parameter] public QuarterDepartmentRankDto Item { get; set; } = new();
-    
+
+    [Parameter] public EventCallback GetListBtn { get; set; }
+
     string Text { get; set; } = ConstName.Edit;
     string btnText { get; set; } = "Tạo mới";
-    bool created = false;
+
+    /// <summary>
+    /// Trong thực tế nhân viên họ chỉ chấm cho cá nhân của đơn vị mà quên chấm cho đơn vị
+    /// </summary>
+    /// <returns></returns>
     async Task InitBtn()
     {
-        //dto = new ()  { Id=Id, DeptId=DeptId, Quarter=(byte)Quarter };
-        Item.RewardId = 20;
+        Item.RewardId = 20;//khởi tạo mặc định xếp loại A
+
         var result = await client.PostAsync<QuarterDepartmentRankDto, ResultDto<bool>>(QuarterDepartmentRankApiRoute.Create(QuarterDepartmentRankApiRoute.ControllerName), Item!);
         if (result != null && result.IsSuccess)
         {
             btnText = ConstName.Edit;
-            created = true;
+            await GetListBtn.InvokeAsync();
         }
         else
         {

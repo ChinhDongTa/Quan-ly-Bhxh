@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using DongTa.TypeExtension;
 using DefaultValue.ApiRoute;
+using Dtos.Human;
 
 namespace ApiGateway.Controllers {
 

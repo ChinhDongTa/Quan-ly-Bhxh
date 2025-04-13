@@ -35,8 +35,8 @@ public partial class Employee {
 
     public virtual Position? Post { get; set; }
 
-    public virtual ICollection<QuarterEmployeeRank>? QuarterEmployeeRanks { get; set; } = [];
-    public virtual ICollection<ApiUser>? ApiUsers { get; set; } = [];
+    public virtual ICollection<QuarterEmployeeRank>? QuarterEmployeeRanks { get; set; }
+    public virtual ICollection<ApiUser>? ApiUsers { get; set; }
 
     public virtual SalaryCoefficient? SalaryCoefficient { get; set; }
 }

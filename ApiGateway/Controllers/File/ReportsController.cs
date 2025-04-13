@@ -2,7 +2,7 @@
 using ApiGateway.Controllers.File.Rdlcs;
 using ApiGateway.Helpers;
 using DataServices.Data;
-using Dtos;
+using Dtos.Human;
 using Dtos.Parameter;
 using DefaultValue;
 using DongTa.BaseDapper;

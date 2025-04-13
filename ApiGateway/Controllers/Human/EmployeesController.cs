@@ -1,5 +1,5 @@
 ﻿using DataServices.Data;
-using Dtos;
+using Dtos.Human;
 using DefaultValue;
 using DefaultValue.ApiRoute;
 using DongTa.BaseDapper;
@@ -25,6 +25,32 @@ public class EmployeesController(BhxhDbContext context, IGenericDapper dapper) :
                                     .OrderBy(x => x.SortOrder).ThenBy(x => x.Birthdate)
                                    .Select(x => x.ToDto()).ToListAsync())
             );
+    }
+
+    [HttpGet("GetBirthdayInMonth/{month}/{isAll}")]
+    public async Task<IActionResult> GetBirthdayInMonth(int month, bool isAll = false)
+    {
+        if (isAll)
+        {
+            return Ok(ResultExtension.GetResult(
+                await context.Employees
+                    .Where(x => x.Birthdate.HasValue && x.Birthdate.Value.Month == month && x.IsQuitJob == false)
+                    .Include(x => x.SalaryCoefficient).Include(x => x.Dept).Include(x => x.Post)
+                    .OrderBy(x => x.SortOrder).ThenBy(x => x.Birthdate)
+                    .Select(x => x.ToDto()).ToListAsync())
+                );
+        }
+        else
+        {
+            return Ok(ResultExtension.GetResult(
+                await context.Employees
+                    .Where(x => x.Birthdate.HasValue && x.Birthdate.Value.Month == month
+                        && x.IsQuitJob == false && x.Dept != null && x.Dept.LevelId == 2) // Added null check for x.Dept
+                    .Include(x => x.SalaryCoefficient).Include(x => x.Dept).Include(x => x.Post)
+                    .OrderBy(x => x.SortOrder).ThenBy(x => x.Birthdate)
+                    .Select(x => x.ToDto()).ToListAsync())
+                );
+        }
     }
 
     [HttpGet("FindByName/{name}/{quitJob}")]

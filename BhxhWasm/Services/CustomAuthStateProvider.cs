@@ -1,5 +1,5 @@
 ﻿using Blazored.LocalStorage;
-using Dtos;
+using Dtos.Human;
 using DefaultValue;
 using DefaultValue.ApiRoute;
 using DongTa.ResponseMessage;
@@ -14,9 +14,9 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
     public readonly IHttpClientBase client;
     public readonly ISyncLocalStorageService LocalStorage;
 
-    public CustomAuthStateProvider(IHttpClientBase Http, ISyncLocalStorageService LocalStorage)
+    public CustomAuthStateProvider(IHttpClientBase httpClient, ISyncLocalStorageService LocalStorage)
     {
-        this.client = Http;
+        client = httpClient;
         this.LocalStorage = LocalStorage;
         var accessToken = LocalStorage.GetItem<string>("accessToken");
         if (accessToken != null)

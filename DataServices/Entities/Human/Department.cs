@@ -19,7 +19,8 @@ public partial class Department {
 
     public int LevelId { get; set; }
     public virtual Level? Level { get; set; }
-    public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
+    public virtual ICollection<Employee>? Employees { get; set; }
 
-    public virtual ICollection<QuarterDepartmentRank> QuarterDepartmentRanks { get; set; } = new List<QuarterDepartmentRank>();
+    public virtual ICollection<QuarterDepartmentRank>? QuarterDepartmentRanks { get; set; }
+    public virtual ICollection<QuarterScoreDept>? QuarterScoreDepts { get; set; }
 }

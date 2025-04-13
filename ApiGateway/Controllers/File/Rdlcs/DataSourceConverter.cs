@@ -5,7 +5,7 @@ using DataTranfer.Mapping;
 using Dtos.Parameter;
 using DongTa.QuarterInYear;
 using DongTa.TypeExtension;
-using Dtos;
+using Dtos.Human;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiGateway.Controllers.File.Rdlcs;

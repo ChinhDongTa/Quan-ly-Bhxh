@@ -1,4 +1,4 @@
-﻿namespace Dtos;
+﻿namespace Dtos.Human;
 
 public record PositionDto {
     public int Id { get; set; }

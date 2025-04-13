@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Dtos;
+namespace Dtos.Human;
 
 public record LoginDto {
     [Required]

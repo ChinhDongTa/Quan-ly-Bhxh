@@ -1,6 +1,6 @@
 ﻿using DataServices.Data;
 using DataServices.Entities.Human;
-using Dtos;
+using Dtos.Human;
 using DataTranfer.Mapping;
 using DefaultValue;
 using DongTa.BaseDapper;

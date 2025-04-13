@@ -17,7 +17,8 @@ public partial class QuarterDepartmentRank {
 
     public string? Note { get; set; }
 
-    public virtual Department Dept { get; set; } = null!;
+    public virtual Department? Dept { get; set; }
 
-    public virtual Reward Reward { get; set; } = null!;
+    public virtual Reward? Reward { get; set; }
+    public virtual ICollection<QuarterScoreDept>? QuarterScoreDepts { get; set; }
 }

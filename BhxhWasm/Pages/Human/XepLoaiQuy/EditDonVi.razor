@@ -28,7 +28,7 @@
                 <FluentButton Appearance="Appearance.Accent" @onclick="SaveBtn">@ConstName.BtnSave</FluentButton>
                 @if (context.User.IsInRole("tccb") || context.User.IsInRole("admin"))
                 {
-                    <FluentAnchor IconStart="@(new Icons.Regular.Size16.ArrowStepBack())" Href="XeploaiQuy/DonVi">Bình xét đơn vị</FluentAnchor>
+                    <FluentAnchor IconStart="@(new Icons.Regular.Size16.ArrowStepBack())" Href="/Human/XeploaiQuy/BinhXetDonVi">Bình xét đơn vị</FluentAnchor>
                 }
             </FluentStack>
         }
@@ -86,7 +86,7 @@
         {
             if (KqxlSelected is not null)
             {
-                dto.Id = KqxlSelected.Id;
+                dto.RewardId = KqxlSelected.Id;
                 //errors?.Add(InfoMessage.Unselect("kết quả xếp loại"));
             }
 

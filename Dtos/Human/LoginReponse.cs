@@ -1,4 +1,4 @@
-﻿namespace Dtos;
+﻿namespace Dtos.Human;
 
 public record LoginReponse {
     public string TokenType { get; set; } = string.Empty;
