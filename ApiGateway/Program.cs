@@ -17,12 +17,12 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var bhxhDbConnectionString = builder.Configuration.GetConnectionString("Employee") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<BhxhDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(bhxhDbConnectionString));
 
 //Add Dapper connection
-builder.Services.AddTransient<IDbConnection>((sp) => new SqlConnection(connectionString));
+builder.Services.AddScoped<IConnectionStringService, ConnectionStringService>(sp => new ConnectionStringService(builder.Configuration));
 builder.Services.AddScoped<IGenericDapper, GenericDapper>();
 builder.Services.AddCors(options =>
 {

@@ -14,7 +14,17 @@ namespace ApiGateway.Controllers.Human;
 
 [Route("[controller]")]
 [ApiController]
-public class DepartmentsController(BhxhDbContext context, IGenericDapper dapper) : ControllerBase {
+[Authorize]
+public class DepartmentsController : ControllerBase {
+    private readonly BhxhDbContext context;
+    private readonly IGenericDapper dapper;
+
+    public DepartmentsController(BhxhDbContext context, IGenericDapper dapper)
+    {
+        this.context = context;
+        this.dapper = dapper;
+        this.dapper.DbNameType = DatabaseNameType.Employee;
+    }
 
     // GET: Departments/All
     [HttpGet(ActionBase.All)]
@@ -61,7 +71,7 @@ public class DepartmentsController(BhxhDbContext context, IGenericDapper dapper)
                 var ok = await context.SaveChangesAsync() > 0;
                 return Ok(ResultExtension.GetResult(ok, InfoMessage.CrudResult(CRUD.Update, ok, nameof(DepartmentDto))));
             }
-            return Ok(Result<bool>.Failure(InfoMessage.NotFound));
+            return Ok(Result<bool>.Failure(InfoMessage.NotFound("DepartmentDto")));
         }
         catch (DbUpdateConcurrencyException)
         {
@@ -92,7 +102,7 @@ public class DepartmentsController(BhxhDbContext context, IGenericDapper dapper)
         var department = await context.Departments.FindAsync(id);
         if (department == null)
         {
-            return Ok(Result<bool>.Failure(InfoMessage.NotFound));
+            return Ok(Result<bool>.Failure(InfoMessage.NotFound("DepartmentDto")));
         }
         context.Departments.Remove(department);
         return Ok(Result<bool>.BoolResult(await context.SaveChangesAsync() > 0));

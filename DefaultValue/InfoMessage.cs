@@ -8,9 +8,8 @@ public record InfoMessage {
     public static string Unselect(string name) => $"Error: Chưa chọn {name}";
     public static string ObjectNull(string objName) => $"Error, {objName} is null";
     public static string NotAuthorized => "Warning: tài khoản của bạn không thể vào chức năng này!";
-    public static string NotFound => "Warning, không tìm thấy kết quả";
-    public static string NotSupport(string objectName) => $"Warning, {objectName} không được hỗ trợ !";
-    public static string DateTimeInvalid => "Warning: ngày tháng năm không hợp lệ";
+    public static string NotFound(string objectName) => $"Error, không tìm thấy đối tượng {objectName}";
+    //public static string InvalidType(string typeName) => $"Error: kieru dữ liệu {typeName} không hợp lệ";
     public static string InputEmpty => "Error: Không có dữ liệu nhập vào !";
     public static string InvalidId(string name) => $"Error: Mã {name} không hợp lệ";
     public static string ActionSuccess(CRUD actionName, string objName) => $"Success: {actionName.CRUD2String()} {objName} thành công";

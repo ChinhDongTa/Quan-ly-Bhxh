@@ -11,12 +11,23 @@ using DongTa.ResponseMessage;
 using DongTa.ResponseResult;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ApiGateway.Controllers.Human;
 
 [Route("[controller]")]
 [ApiController]
-public class QuarterDepartmentRanksController(BhxhDbContext context, IGenericDapper dapper) : ControllerBase {
+[Authorize]
+public class QuarterDepartmentRanksController : ControllerBase {
+    private readonly BhxhDbContext context;
+    private readonly IGenericDapper dapper;
+
+    public QuarterDepartmentRanksController(BhxhDbContext context, IGenericDapper dapper)
+    {
+        this.context = context;
+        this.dapper = dapper;
+        this.dapper.DbNameType = DatabaseNameType.Employee;
+    }
 
     // GET: QuarterDepartmentRanks
     [HttpGet("GetByQuarter/{q}/{year}")]

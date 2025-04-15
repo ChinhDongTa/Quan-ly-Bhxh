@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DataServices.Data;
 
 //DbContextOptions<BhxhDbContext> options
-public class BhxhDbContext : IdentityDbContext<ApiUser> {
+public class BhxhDbContext(DbContextOptions<BhxhDbContext> options) : IdentityDbContext<ApiUser>(options) {
     public virtual DbSet<Department> Departments { get; set; }
 
     public virtual DbSet<Employee> Employees { get; set; }
@@ -23,9 +23,9 @@ public class BhxhDbContext : IdentityDbContext<ApiUser> {
 
     public virtual DbSet<SalaryCoefficient> SalaryCoefficients { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 
-    {
-        optionsBuilder.UseSqlServer("Data Source=10.64.208.250;Initial Catalog=BhxhDb;User ID=sa;Password=2Peng@qu@y; Trust Server Certificate=True;");
-    }
+    //{
+    //    optionsBuilder.UseSqlServer("Data Source=10.64.208.250;Initial Catalog=BhxhDb;User ID=sa;Password=2Peng@qu@y; Trust Server Certificate=True;");
+    //}
 }

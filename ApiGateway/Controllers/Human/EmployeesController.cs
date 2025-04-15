@@ -13,7 +13,17 @@ namespace ApiGateway.Controllers.Human;
 
 [Route("[controller]")]
 [ApiController]
-public class EmployeesController(BhxhDbContext context, IGenericDapper dapper) : ControllerBase {
+[Authorize]
+public class EmployeesController : ControllerBase {
+    private readonly BhxhDbContext context;
+    private readonly IGenericDapper dapper;
+
+    public EmployeesController(BhxhDbContext context, IGenericDapper dapper)
+    {
+        this.context = context;
+        this.dapper = dapper;
+        this.dapper.DbNameType = DatabaseNameType.Employee;
+    }
 
     // GET: api/Employees
     [HttpGet(ActionBase.All)]

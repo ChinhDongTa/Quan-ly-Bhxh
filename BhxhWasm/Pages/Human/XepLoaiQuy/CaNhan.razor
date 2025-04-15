@@ -44,7 +44,7 @@
             string? userId = await authProvider.GetUserIdAsync();
             if (string.IsNullOrEmpty(userId))
             {
-                message = InfoMessage.NotFound;
+            message = InfoMessage.NotFound("userId");
             }
             else
             {

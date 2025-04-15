@@ -50,7 +50,7 @@ public class SalaryCoefficientsController(BhxhDbContext context) : ControllerBas
         {
             if (!SalaryCoefficientExists(id))
             {
-                return Ok(Result<bool>.Failure(InfoMessage.NotFound));
+                return Ok(Result<bool>.Failure(InfoMessage.NotFound("SalaryCoefficient")));
             }
             else
             {
@@ -76,7 +76,7 @@ public class SalaryCoefficientsController(BhxhDbContext context) : ControllerBas
         var salaryCoefficient = await context.SalaryCoefficients.FindAsync(id);
         if (salaryCoefficient == null)
         {
-            return Ok(Result<bool>.Failure(InfoMessage.NotFound));
+            return Ok(Result<bool>.Failure(InfoMessage.NotFound("SalaryCoefficient")));
         }
 
         context.SalaryCoefficients.Remove(salaryCoefficient);

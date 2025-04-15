@@ -24,7 +24,7 @@
                     </FluentGridItem>
                     <FluentGridItem>
                         <SelectListPosition @bind-Item="posSelected" DefaultId="employeeDto.PostId" />
-                        <SelectListDepartment @bind-Item="deptSelected" DefaultId="employeeDto.DeptId" />
+                        <SelectListDepartment @bind-Item="deptSelected" WithBGD="true" DefaultId="employeeDto.DeptId" />
                         <FluentStack Orientation="Orientation.Vertical">
                             <FluentNumberField @bind-Value="employeeDto.SortOrder" Label="Vị trí sắp xếp GĐ, PGĐ = 10, TP=20, CV=30,..." />
                             <FluentCheckbox Label="Nghỉ việc ?" @bind-Value="@employeeDto.IsQuitJob" />

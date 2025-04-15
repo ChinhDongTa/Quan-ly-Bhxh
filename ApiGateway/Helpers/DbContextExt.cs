@@ -77,7 +77,7 @@ public static class DbContextExt {
             //Nếu đã xếp loại rồi thì bỏ qua
             else if (currentQuarterEmployeeRankDto.Count == currentQuarterEmployeeRankDto.Count(x => x.RewardId == 23))
             {
-                await context.QuarterEmployeeRanks.Where(x => x.Employee.DeptId == deptId
+                await context.QuarterEmployeeRanks.Where(x => x.Employee != null && x.Employee.DeptId == deptId
                                     && x.Quarter == quarter.Quarter && x.Year == quarter.Year)
                                     .ForEachAsync(x => context.QuarterEmployeeRanks.Remove(x));
                 await context.SaveChangesAsync();
@@ -94,12 +94,13 @@ public static class DbContextExt {
         return null;
     }
 
+    // Fix for CS8602: Dereference of a possibly null reference.
     private static async Task<List<QuarterEmployeeRankDto>> GetQuarterEmployeeRankDtos(
         this BhxhDbContext context, int deptId, QuarterInYear quarter)
     {
-        //xếp loại cho quý của 1 đơn vị
+        // Ensure that Employee is not null before accessing its properties
         return await context.QuarterEmployeeRanks
-            .Where(x => x.Employee.DeptId == deptId && x.Quarter == quarter.Quarter && x.Year == quarter.Year)
+            .Where(x => x.Employee != null && x.Employee.DeptId == deptId && x.Quarter == quarter.Quarter && x.Year == quarter.Year)
             .Include(x => x.Employee)
             .Include(x => x.Reward)
             .Select(x => x.ToDto()).ToListAsync();

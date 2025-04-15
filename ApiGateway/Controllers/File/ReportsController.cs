@@ -20,7 +20,16 @@ namespace ApiGateway.Controllers.File;
 [Route("[controller]")]
 [ApiController]
 [Authorize]
-public class ReportsController(BhxhDbContext context, IGenericDapper dapper) : ControllerBase {
+public class ReportsController : ControllerBase {
+    private readonly BhxhDbContext context;
+    private readonly IGenericDapper dapper;
+
+    public ReportsController(BhxhDbContext _context, IGenericDapper _dapper)
+    {
+        context = _context;
+        dapper = _dapper;
+        dapper.DbNameType = DatabaseNameType.Employee;
+    }
 
     [HttpGet("test/{userId}")]
     public async Task<IActionResult> Test(string userId)

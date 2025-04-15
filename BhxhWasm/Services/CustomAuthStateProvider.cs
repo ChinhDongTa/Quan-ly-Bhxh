@@ -38,9 +38,15 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
                 {
                     new(ClaimTypes.NameIdentifier, result.Dto.Id),
                     new(ClaimTypes.Name, result.Dto.Username),
-                    new(ClaimTypes.Email, result.Dto.Email),
-                    new(ClaimTypes.Role, result.Dto.RoleName)
+                    new(ClaimTypes.Email, result.Dto.Email)
                 };
+
+                // Fix for CS1503: Convert IEnumerable<string> RoleNames to individual claims
+                if (result.Dto.RoleNames != null)
+                {
+                    claims.AddRange(result.Dto.RoleNames.Select(role => new Claim(ClaimTypes.Role, role)));
+                }
+
                 var identity = new ClaimsIdentity(claims, "Token");
                 user = new ClaimsPrincipal(identity);
                 return new AuthenticationState(user);
@@ -99,7 +105,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
         try
         {
             var responseMessage = await client.PostAsync<RegisterDto, ResultDto<bool>>(AccountApiRoute.Register, registerDto);
-            if (responseMessage != null)
+            if (responseMessage != null && responseMessage.IsSuccess)
             {
                 return await LoginAsync(new LoginDto
                 {

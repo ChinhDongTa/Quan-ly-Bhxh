@@ -21,8 +21,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Entities\Tst\" />
-  </ItemGroup>
-
 </Project>

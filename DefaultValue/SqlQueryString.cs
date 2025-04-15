@@ -17,11 +17,11 @@ public static class SqlQueryString {
           d.Email,
           d.SortOrder,
           d.LevelId,
-          [Level].Name AS LevelName
+          Levels.Name AS LevelName
         FROM
           Departments AS d
           INNER JOIN Employees ON d.Id = Employees.DeptId
-          INNER JOIN [Level] ON d.LevelId = [Level].Id
+          INNER JOIN Levels ON d.LevelId = Levels.Id
         """;
 
     public static string SelectDepartmentDtoByUserId(string userId) => $"""
