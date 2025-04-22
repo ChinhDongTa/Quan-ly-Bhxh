@@ -19,7 +19,6 @@ namespace ApiGateway.Controllers.File;
 
 [Route("[controller]")]
 [ApiController]
-[Authorize]
 public class ReportsController : ControllerBase {
     private readonly BhxhDbContext context;
     private readonly IGenericDapper dapper;

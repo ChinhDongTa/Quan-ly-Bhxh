@@ -16,7 +16,7 @@ public static class DepartmentMapper {
             Phone = department.Phone,
             Score = department.Score,
             SortOrder = department.SortOrder,
-            IsActivity = department.IsActivity,
+            IsActive = department.IsActive,
             LevelId = department.LevelId,
             LevelName = department.Level?.Name
         };
@@ -35,7 +35,7 @@ public static class DepartmentMapper {
                 Phone = dto.Phone,
                 Score = dto.Score,
                 SortOrder = dto.SortOrder,
-                IsActivity = dto.IsActivity,
+                IsActive = dto.IsActive,
                 LevelId = dto.LevelId ?? 2 // mặc định là văn phòng
             };
         }
@@ -45,7 +45,7 @@ public static class DepartmentMapper {
         department.Phone = dto.Phone;
         department.Score = dto.Score;
         department.SortOrder = dto.SortOrder;
-        department.IsActivity = dto.IsActivity;
+        department.IsActive = dto.IsActive;
         department.LevelId = dto.LevelId ?? 2; // Default value or handle appropriately
         return department;
     }

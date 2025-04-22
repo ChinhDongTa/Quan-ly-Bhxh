@@ -58,12 +58,6 @@ public static class SqlQueryString {
           e.SortOrder,
           e.TelegramId,
           e.Gender
-        FROM
-          Departments as d
-          INNER JOIN Employees AS e ON d.Id = e.DeptId
-          INNER JOIN Positions as p ON e.PostId = p.Id
-          INNER JOIN SalaryCoefficients as s ON e.SalaryCoefficientId = s.Id
-          INNER JOIN AspNetUsers ON e.Id = AspNetUsers.EmployeeId
         """;
 
     public static string GetDeptHeadByUserId(string userId)
@@ -72,6 +66,11 @@ public static class SqlQueryString {
             DECLARE @deptId INT
             SET @deptId = ({SelectDeptIdByUserId(userId)})
             {SelectEmployeeDto}
+            FROM
+              Departments as d
+              INNER JOIN Employees AS e ON d.Id = e.DeptId
+              INNER JOIN Positions as p ON e.PostId = p.Id
+              INNER JOIN SalaryCoefficients as s ON e.SalaryCoefficientId = s.Id
             WHERE
               e.IsQuitJob = 0
               AND e.DeptId = @deptId
@@ -119,6 +118,12 @@ public static class SqlQueryString {
     {
         return $"""
             {SelectEmployeeDto}
+            FROM
+              Departments as d
+              INNER JOIN Employees AS e ON d.Id = e.DeptId
+              INNER JOIN Positions as p ON e.PostId = p.Id
+              INNER JOIN SalaryCoefficients as s ON e.SalaryCoefficientId = s.Id
+              INNER JOIN AspNetUsers ON e.Id = AspNetUsers.EmployeeId
             WHERE
               AspNetUsers.Id = '{userId}'
             """;

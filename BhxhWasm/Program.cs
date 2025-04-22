@@ -1,5 +1,6 @@
 using BhxhWasm;
 using BhxhWasm.Services;
+using BlazorDownloadFile;
 using Blazored.LocalStorage;
 using HttpClientBase;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -19,6 +20,7 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddBlazorDownloadFile(ServiceLifetime.Scoped);
 
 builder.Services.AddScoped(sp => new HttpClient
 {

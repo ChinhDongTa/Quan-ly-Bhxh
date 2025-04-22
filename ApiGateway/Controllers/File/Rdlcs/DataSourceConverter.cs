@@ -125,10 +125,10 @@ internal class DataSourceConverter {
                 };
                 switch (item.RewardId)
                 {
-                    case 22: line.A = "x"; break;
-                    case 23: line.B = "x"; break;
-                    case 24: line.C = "x"; break;
-                    case 25: line.D = "x"; break;
+                    case 20: line.A = "x"; break;
+                    case 21: line.B = "x"; break;
+                    case 22: line.C = "x"; break;
+                    case 23: line.D = "x"; break;
                     default:
                         break;
                 }

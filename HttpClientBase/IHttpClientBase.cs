@@ -38,5 +38,14 @@ public interface IHttpClientBase {
     /// <returns></returns>
     Task<TResponse?> DeleteAsync<TResponse>(string url);
 
+    /// <summary>
+    /// Download file from API
+    /// </summary>
+    /// <typeparam name="TRequest"></typeparam>
+    /// <param name="url"></param>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    Task<Stream?> PostAndDownloadAsync<TRequest>(string url, TRequest data);
+
     void SetAuthorizationHeader(string? token = null, string tokenType = "Bearer");
 }

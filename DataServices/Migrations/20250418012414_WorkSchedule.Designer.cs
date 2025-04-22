@@ -4,6 +4,7 @@ using DataServices.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataServices.Migrations
 {
     [DbContext(typeof(BhxhDbContext))]
-    partial class BhxhDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250418012414_WorkSchedule")]
+    partial class WorkSchedule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -450,80 +453,6 @@ namespace DataServices.Migrations
                     b.ToTable("SalaryCoefficients");
                 });
 
-            modelBuilder.Entity("DataServices.Entities.Human.WorkDay", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
-
-                    b.Property<int>("WorkScheduleId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WorkScheduleId");
-
-                    b.ToTable("WorkDays");
-                });
-
-            modelBuilder.Entity("DataServices.Entities.Human.WorkSchedule", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateOnly>("EndDay")
-                        .HasColumnType("date");
-
-                    b.Property<DateOnly>("StartDay")
-                        .HasColumnType("date");
-
-                    b.Property<DateTime?>("UpdateAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("WorkSchedules");
-                });
-
-            modelBuilder.Entity("DataServices.Entities.Human.WorkShift", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("WorkDayId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WorkDayId");
-
-                    b.ToTable("WorkShifts");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -766,37 +695,6 @@ namespace DataServices.Migrations
                     b.Navigation("QuarterDeptRank");
                 });
 
-            modelBuilder.Entity("DataServices.Entities.Human.WorkDay", b =>
-                {
-                    b.HasOne("DataServices.Entities.Human.WorkSchedule", "WorkSchedule")
-                        .WithMany("WorkDays")
-                        .HasForeignKey("WorkScheduleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("WorkSchedule");
-                });
-
-            modelBuilder.Entity("DataServices.Entities.Human.WorkSchedule", b =>
-                {
-                    b.HasOne("DataServices.Entities.Human.ApiUser", "User")
-                        .WithMany("WorkSchedules")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("DataServices.Entities.Human.WorkShift", b =>
-                {
-                    b.HasOne("DataServices.Entities.Human.WorkDay", "WorkDay")
-                        .WithMany("WorkShifts")
-                        .HasForeignKey("WorkDayId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("WorkDay");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -851,8 +749,6 @@ namespace DataServices.Migrations
             modelBuilder.Entity("DataServices.Entities.Human.ApiUser", b =>
                 {
                     b.Navigation("EventLogs");
-
-                    b.Navigation("WorkSchedules");
                 });
 
             modelBuilder.Entity("DataServices.Entities.Human.Department", b =>
@@ -896,16 +792,6 @@ namespace DataServices.Migrations
             modelBuilder.Entity("DataServices.Entities.Human.SalaryCoefficient", b =>
                 {
                     b.Navigation("Employees");
-                });
-
-            modelBuilder.Entity("DataServices.Entities.Human.WorkDay", b =>
-                {
-                    b.Navigation("WorkShifts");
-                });
-
-            modelBuilder.Entity("DataServices.Entities.Human.WorkSchedule", b =>
-                {
-                    b.Navigation("WorkDays");
                 });
 #pragma warning restore 612, 618
         }

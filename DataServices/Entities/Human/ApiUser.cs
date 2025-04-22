@@ -7,4 +7,5 @@ public class ApiUser : IdentityUser {
 
     public virtual Employee? Employee { get; set; }
     public virtual ICollection<EventLog>? EventLogs { get; set; }
+    public virtual ICollection<WorkSchedule>? WorkSchedules { get; set; }
 }

@@ -103,7 +103,9 @@ public static class DbContextExt {
             .Where(x => x.Employee != null && x.Employee.DeptId == deptId && x.Quarter == quarter.Quarter && x.Year == quarter.Year)
             .Include(x => x.Employee)
             .Include(x => x.Reward)
-            .Select(x => x.ToDto()).ToListAsync();
+            .OrderBy(x => x.Employee!.SortOrder).ThenBy(x => x.Employee!.Birthdate)
+            .Select(x => x.ToDto())
+            .ToListAsync();
     }
 
     private static async Task<bool> InitQuarterEmployeeRank(

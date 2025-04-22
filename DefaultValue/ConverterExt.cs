@@ -1,6 +1,7 @@
 ﻿namespace DefaultValue;
 
 public static class ConverterExt {
+
     public static string CRUD2String(this CRUD crud) => crud switch
     {
         CRUD.Create => "Tạo",
@@ -9,5 +10,4 @@ public static class ConverterExt {
         CRUD.Delete => "Xóa",
         _ => "Không xác định"
     };
-
 }

@@ -49,7 +49,7 @@
     {
         var authStateProvider = (CustomAuthStateProvider)provider;
             bienBan = new BienBanHopQuyPara();
-        bienBan.UserId = await  authStateProvider.GetUserIdAsync();
+        bienBan.UserId = await  authStateProvider.GetUserIdAsync()??"";
             errors = new List<string>();
             if (string.IsNullOrEmpty(bienBan.UserId))
             {
@@ -89,7 +89,7 @@
     {
         if (bienBan is not null)
         {
-            var stream = await client.PostAsync<BienBanHopQuyPara,Stream>(ReportApiRoute.BienBanHopQuy, bienBan);
+            var stream = await client.PostAndDownloadAsync<BienBanHopQuyPara>(ReportApiRoute.BienBanHopQuy, bienBan);
 
             if (stream is not null)
             {

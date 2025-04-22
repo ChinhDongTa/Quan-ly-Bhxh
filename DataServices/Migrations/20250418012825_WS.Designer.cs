@@ -4,6 +4,7 @@ using DataServices.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataServices.Migrations
 {
     [DbContext(typeof(BhxhDbContext))]
-    partial class BhxhDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250418012825_WS")]
+    partial class WS
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -458,8 +461,8 @@ namespace DataServices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("WorkScheduleId")
                         .HasColumnType("int");
@@ -479,21 +482,13 @@ namespace DataServices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateOnly>("EndDay")
-                        .HasColumnType("date");
-
-                    b.Property<DateOnly>("StartDay")
-                        .HasColumnType("date");
-
-                    b.Property<DateTime?>("UpdateAt")
+                    b.Property<DateTime>("EndDay")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<DateTime>("StartDay")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("WorkSchedules");
                 });
@@ -777,15 +772,6 @@ namespace DataServices.Migrations
                     b.Navigation("WorkSchedule");
                 });
 
-            modelBuilder.Entity("DataServices.Entities.Human.WorkSchedule", b =>
-                {
-                    b.HasOne("DataServices.Entities.Human.ApiUser", "User")
-                        .WithMany("WorkSchedules")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("DataServices.Entities.Human.WorkShift", b =>
                 {
                     b.HasOne("DataServices.Entities.Human.WorkDay", "WorkDay")
@@ -851,8 +837,6 @@ namespace DataServices.Migrations
             modelBuilder.Entity("DataServices.Entities.Human.ApiUser", b =>
                 {
                     b.Navigation("EventLogs");
-
-                    b.Navigation("WorkSchedules");
                 });
 
             modelBuilder.Entity("DataServices.Entities.Human.Department", b =>

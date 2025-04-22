@@ -1,11 +1,10 @@
 using DataServices.Data;
 using DataServices.Entities.Human;
 using DongTa.BaseDapper;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
-using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,6 +60,11 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 app.UseCors("AllowBlazorWasm");
 app.MapIdentityApi<ApiUser>();

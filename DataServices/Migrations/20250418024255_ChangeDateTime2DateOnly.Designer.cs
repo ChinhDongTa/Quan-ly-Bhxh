@@ -4,6 +4,7 @@ using DataServices.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataServices.Migrations
 {
     [DbContext(typeof(BhxhDbContext))]
-    partial class BhxhDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250418024255_ChangeDateTime2DateOnly")]
+    partial class ChangeDateTime2DateOnly
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -484,9 +487,6 @@ namespace DataServices.Migrations
 
                     b.Property<DateOnly>("StartDay")
                         .HasColumnType("date");
-
-                    b.Property<DateTime?>("UpdateAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");

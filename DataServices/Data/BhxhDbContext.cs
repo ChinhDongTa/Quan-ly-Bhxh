@@ -23,8 +23,11 @@ public class BhxhDbContext(DbContextOptions<BhxhDbContext> options) : IdentityDb
 
     public virtual DbSet<SalaryCoefficient> SalaryCoefficients { get; set; }
 
-    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public virtual DbSet<WorkDay> WorkDays { get; set; }
+    public virtual DbSet<WorkSchedule> WorkSchedules { get; set; }
+    public virtual DbSet<WorkShift> WorkShifts { get; set; }
 
+    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     //{
     //    optionsBuilder.UseSqlServer("Data Source=10.64.208.250;Initial Catalog=BhxhDb;User ID=sa;Password=2Peng@qu@y; Trust Server Certificate=True;");
     //}

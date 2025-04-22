@@ -1,0 +1,148 @@
+﻿@page "/human/ws/index"
+@inject IHttpClientBase client
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using BhxhWasm.Services;
+@inject AuthenticationStateProvider authProvider
+@inject IDialogService DialogService
+@if (workScheduleDto is null)
+{
+    <LoadPage />
+}
+else
+{
+    <LabelHeader Text=@($"Lịch công tác từ ngày {workScheduleDto.StartDay:dd-MM-yyyy} đến ngày {workScheduleDto.EndDay:dd-MM-yyyy}") />
+    <AlertMessage Message="@message" />
+    <table class="bordered">
+        <thead>
+            <tr>
+                <th width="100" >Thứ ngày</th>
+                <th width="50%">Sáng</th>
+                <th width="50%">Chiều</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in workScheduleDto.WorkDays)
+            {
+                <tr>
+                    <td style="text-align:center;">@(GetDayOfWeek(item.Date))</td>
+                    <td style="position: relative; ">
+
+                        @{
+                            var morning = item.WorkShiftDtos?.FirstOrDefault(x => x.Name == "Sáng");
+                            if (morning != null)
+                            {
+                                <div style="background-color: lightblue;">
+
+                                    @(new MarkupString(morning?.Description ?? string.Empty))
+                                </div>
+                                if (isEdit is true)
+                                {
+                                    <div style="position: absolute; bottom: 0; right: 0;padding-top:10px">
+                                        <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size16.Edit())"
+                                                      OnClick="()=>BtnEditItem(morning!.Id)" />
+                                    </div>
+                                }
+                            }
+                        }
+                    </td>
+                    <td style="position: relative;">
+
+                        @{
+                            var afternoon = item.WorkShiftDtos?.FirstOrDefault(x => x.Name == "Chiều");
+                            if (afternoon != null)
+                            {
+                                <div style="background-color: lightblue;">
+
+                                    @(new MarkupString(afternoon?.Description ?? string.Empty))
+                                </div>
+                                if (isEdit is true)
+                                {
+                                    <div style="position: absolute; bottom: 0; right: 0; padding-top:10px">
+                                        <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size16.Edit())"
+                                                      OnClick="()=>BtnEditItem(afternoon!.Id)" />
+                                    </div>
+                                   
+                                }
+
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div style="margin:30px">
+        <FluentButton Appearance=Appearance.Accent IconStart="@(new Icons.Regular.Size16.Save())" @onclick="SaveWsBtn">@ConstName.BtnSave</FluentButton>
+    </div>
+}
+@code {
+    WorkScheduleDto? workScheduleDto;
+    public WorkShiftDto? WorkShiftDto { get; set; }
+    bool? isEdit;
+    string? message;
+    protected override async Task OnInitializedAsync()
+    {
+        var resultDto = await client.GetAsync<ResultDto<WorkScheduleDto>>(WorkScheduleRoute.GetOne(6));
+        if (resultDto !=null && resultDto.IsSuccess)
+        {
+            workScheduleDto = resultDto.Dto;
+            //userId = await authProvider.GetUserIdAsync();
+            isEdit = await authProvider.HaveRole("admin");
+        }
+        else
+        {
+            // Handle error
+        }
+    }
+    async Task BtnEditItem(int id)
+    {
+        // Create a new instance of DialogData
+        // to allow the user to cancel the update
+        var WorkShiftDto = workScheduleDto?.WorkDays
+            .SelectMany(x => x.WorkShiftDtos!)
+            .FirstOrDefault(x => x.Id == id);
+        if (WorkShiftDto != null)
+        {
+            var dialog = await DialogService.ShowDialogAsync<EditWorkShiftDialog>(WorkShiftDto, new DialogParameters()
+                {
+                    Width = "600px",
+                    Title = $"Updating the {WorkShiftDto.Name} sheet",
+                    PreventDismissOnOverlayClick = true,
+                    PreventScroll = true,
+                });
+
+            var result = await dialog.Result;
+            if (!result.Cancelled && result.Data != null)
+            {
+                WorkShiftDto = (WorkShiftDto)result.Data;
+            }
+        }
+    }
+
+    async Task SaveWsBtn()
+    {
+        var list = workScheduleDto?.WorkDays
+            .SelectMany(x => x.WorkShiftDtos!).Where(x => x.IsEdit==true)
+            .ToList();
+        if (list.HasItems())
+        {
+            var result= await  client.PutAsync<List<WorkShiftDto>,ResultDto<bool>>(WorkScheduleRoute.UpdateList, list!);
+            if (result != null && result.IsSuccess)
+            {
+                message = "Cập nhật thành công";
+            }
+            else
+            {
+                message = "Cập nhật không thành công";
+            }
+        }
+    }
+
+    // Chuyển kiểu DateOnly sáng chuỗi Việt =>"Thứ sáu (18/04/2025)"
+    static MarkupString GetDayOfWeek(DateOnly date)
+    {
+        // Vietnamese day names
+        string[] vietnameseDays = { "Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy" };
+        return new MarkupString($"{vietnameseDays[(int)date.DayOfWeek]}<br/>({date.ToString("dd/MM/yyyy")})");
+    }
+}

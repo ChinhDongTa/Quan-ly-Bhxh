@@ -39,7 +39,7 @@ public class QuarterDepartmentRanksController : ControllerBase {
             .Include(x => x.Dept).Include(x => x.Reward)
             .Select(x => x.ToDto()).ToListAsync();
         //var deptIds = await dapper.GetByQueryAsync<int>("select Id, ShortName from Departments where IsActivity = 1");
-        var dept = await context.Departments.Where(x => x.IsActivity == true).ToListAsync();
+        var dept = await context.Departments.Where(x => x.IsActive == true).ToListAsync();
 
         foreach (var item in dept!)
         {

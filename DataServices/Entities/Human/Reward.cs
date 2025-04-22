@@ -1,5 +1,8 @@
 ﻿namespace DataServices.Entities.Human;
 
+/// <summary>
+/// Lớp đại diện cho phần thưởng.
+/// </summary>
 public partial class Reward {
     public int Id { get; set; }
 

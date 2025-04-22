@@ -10,7 +10,6 @@
         <FluentGridItem>
     <FluentCheckbox @bind-Value="isQuitJob" style="margin-top:24px" Label="Bao gồm nghỉ việc" />
         </FluentGridItem>
-        @*<SelectListDept @bind-Dept="dept"/> *@
         <FluentGridItem >
             <FluentButton Appearance="Appearance.Accent" style="margin-top:24px" @onclick="SearchBtn" IconStart="@(new Icons.Regular.Size20.Search())">
                 @ConstName.BtnSearch
@@ -54,10 +53,8 @@
                 employeeDtos = Enumerable.Empty<EmployeeDto>();
                 message = result?.Message?.ToString();
             }
-            StateHasChanged();
         }
         else
             message = InfoMessage.InputEmpty;
-        StateHasChanged();
     }
 }

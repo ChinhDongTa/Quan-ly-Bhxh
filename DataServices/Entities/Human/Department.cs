@@ -9,7 +9,7 @@ public partial class Department {
 
     public int? Score { get; set; }
 
-    public bool IsActivity { get; set; }
+    public bool IsActive { get; set; }
 
     public string? Email { get; set; }
 

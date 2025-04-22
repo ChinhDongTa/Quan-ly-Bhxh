@@ -23,7 +23,7 @@ public class DepartmentsController : ControllerBase {
     {
         this.context = context;
         this.dapper = dapper;
-        this.dapper.DbNameType = DatabaseNameType.Employee;
+        this.dapper.DbNameType = DatabaseNameType.Employee;//default
     }
 
     // GET: Departments/All

@@ -18,6 +18,12 @@ public class HttpClientBase(HttpClient _httpClient) : IHttpClientBase {
         return await response.Content.ReadFromJsonAsync<TResponse>();
     }
 
+    public async Task<Stream?> PostAndDownloadAsync<TRequest>(string url, TRequest data)
+    {
+        var response = await _httpClient.PostAsJsonAsync(url, data);
+        return await response.Content.ReadAsStreamAsync();
+    }
+
     public async Task<TResponse?> PostAsync<TRequest, TResponse>(string url, TRequest data)
     {
         var response = await _httpClient.PostAsJsonAsync(url, data);
