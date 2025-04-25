@@ -18,7 +18,11 @@ public static class WorkScheduleHelper {
         // Fix for CS0201: Assign the result of the null-coalescing operation to nextMonday
         date ??= DateOnly.FromDateTime(DateTime.Now);
         var nextMonday = GetNextMonday(date.Value);
-
+        // Nếu đã có lịch làm việc cho tuần này thì không tạo mới
+        if (context.WorkSchedules.Any(x => x.EndDay >= nextMonday))
+        {
+            return;
+        }
         WorkSchedule workSchedule = new()
         {
             StartDay = nextMonday,
@@ -108,7 +112,7 @@ public static class WorkScheduleHelper {
         await context.SaveChangesAsync();
     }
 
-    private static DateOnly GetNextMonday(DateOnly date)
+    public static DateOnly GetNextMonday(DateOnly date)
     {
         int daysToAdd = (7 - (int)date.DayOfWeek + 1) % 7;
         if (daysToAdd == 0)

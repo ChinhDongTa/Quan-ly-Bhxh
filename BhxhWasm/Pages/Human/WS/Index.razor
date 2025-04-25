@@ -4,6 +4,7 @@
 @using BhxhWasm.Services;
 @inject AuthenticationStateProvider authProvider
 @inject IDialogService DialogService
+
 @if (workScheduleDto is null)
 {
     <LoadPage />
@@ -26,44 +27,42 @@ else
                 <tr>
                     <td style="text-align:center;">@(GetDayOfWeek(item.Date))</td>
                     <td style="position: relative; ">
-
                         @{
                             var morning = item.WorkShiftDtos?.FirstOrDefault(x => x.Name == "Sáng");
                             if (morning != null)
                             {
-                                <div style="background-color: lightblue;">
+                                <div style="padding-bottom:30px">
 
                                     @(new MarkupString(morning?.Description ?? string.Empty))
                                 </div>
                                 if (isEdit is true)
                                 {
-                                    <div style="position: absolute; bottom: 0; right: 0;padding-top:10px">
-                                        <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size16.Edit())"
-                                                      OnClick="()=>BtnEditItem(morning!.Id)" />
+                                    <div style="position: absolute; bottom: 0; right: 0;padding:5px">
+                                        <FluentButton Appearance="Appearance.Accent" 
+                                        IconStart="@(new Icons.Regular.Size16.Edit())"
+                                        OnClick="()=>BtnEditItem(morning!.Id)" />
                                     </div>
                                 }
                             }
                         }
                     </td>
                     <td style="position: relative;">
-
                         @{
                             var afternoon = item.WorkShiftDtos?.FirstOrDefault(x => x.Name == "Chiều");
                             if (afternoon != null)
                             {
-                                <div style="background-color: lightblue;">
+                                <div style="padding-bottom:30px">
 
                                     @(new MarkupString(afternoon?.Description ?? string.Empty))
                                 </div>
                                 if (isEdit is true)
                                 {
-                                    <div style="position: absolute; bottom: 0; right: 0; padding-top:10px">
-                                        <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size16.Edit())"
-                                                      OnClick="()=>BtnEditItem(afternoon!.Id)" />
+                                    <div style="position: absolute; bottom: 0; right: 0; padding:5px">
+                                        <FluentButton Appearance="Appearance.Accent" 
+                                        IconStart="@(new Icons.Regular.Size16.Edit())"
+                                        OnClick="()=>BtnEditItem(afternoon!.Id)" />
                                     </div>
-                                   
                                 }
-
                             }
                         }
                     </td>
@@ -71,18 +70,35 @@ else
             }
         </tbody>
     </table>
-    <div style="margin:30px">
-        <FluentButton Appearance=Appearance.Accent IconStart="@(new Icons.Regular.Size16.Save())" @onclick="SaveWsBtn">@ConstName.BtnSave</FluentButton>
-    </div>
+    <label style="padding-bottom:20px">Người tạo: @workScheduleDto.InforUserCreated</label>
+
+    <FluentStack HorizontalGap="10">
+        <FluentButton Appearance=Appearance.Neutral IconStart="@(new Icons.Filled.Size24.ArrowCircleLeft().WithColor(Color.Success))" @onclick="BtnBack"></FluentButton>
+        <FluentButton Appearance=Appearance.Neutral IconStart="@(new Icons.Filled.Size24.ArrowCircleRight().WithColor(Color.Success))" @onclick="BtnNext"></FluentButton>
+
+        @if (isEdit is true && now<=workScheduleDto.EndDay)
+        {
+            <FluentButton Appearance=Appearance.Accent IconStart="@(new Icons.Regular.Size16.Save())" @onclick="SaveWsBtn">@ConstName.BtnSave</FluentButton>
+            <FluentButton Appearance=Appearance.Accent IconStart="@(new Icons.Regular.Size16.AddCircle())" @onclick="CreateWsBtn">@ConstName.Add</FluentButton>
+        }
+    </FluentStack>
 }
+
 @code {
+
+    /// <summary>
+    /// Lịch làm việc bắt đầu từ thứ hai và kết thúc vào ngày Chúa nhựt
+    /// </summary>
+
     WorkScheduleDto? workScheduleDto;
     public WorkShiftDto? WorkShiftDto { get; set; }
     bool? isEdit;
+    DateOnly now = DateOnly.FromDateTime(DateTime.Now);
     string? message;
+
     protected override async Task OnInitializedAsync()
     {
-        var resultDto = await client.GetAsync<ResultDto<WorkScheduleDto>>(WorkScheduleRoute.GetOne(6));
+        var resultDto = await client.GetAsync<ResultDto<WorkScheduleDto>>(WorkScheduleRoute.GetByDate(now));
         if (resultDto !=null && resultDto.IsSuccess)
         {
             workScheduleDto = resultDto.Dto;
@@ -91,16 +107,16 @@ else
         }
         else
         {
-            // Handle error
+            message = InfoMessage.ActionFailed("Lịch công tác");
         }
     }
+
     async Task BtnEditItem(int id)
     {
-        // Create a new instance of DialogData
-        // to allow the user to cancel the update
         var WorkShiftDto = workScheduleDto?.WorkDays
             .SelectMany(x => x.WorkShiftDtos!)
             .FirstOrDefault(x => x.Id == id);
+
         if (WorkShiftDto != null)
         {
             var dialog = await DialogService.ShowDialogAsync<EditWorkShiftDialog>(WorkShiftDto, new DialogParameters()
@@ -110,7 +126,6 @@ else
                     PreventDismissOnOverlayClick = true,
                     PreventScroll = true,
                 });
-
             var result = await dialog.Result;
             if (!result.Cancelled && result.Data != null)
             {
@@ -119,21 +134,81 @@ else
         }
     }
 
+    /// <summary>
+    /// Tạo lịch công tác tuần tiếp theo
+    /// </summary>
+    /// <returns></returns>
+    async Task CreateWsBtn()
+    {
+        var userId = await authProvider.GetUserIdAsync();
+        var date = workScheduleDto?.EndDay;
+        if (userId != null && date != null)
+        {
+            var resultDto = await client.GetAsync<ResultDto<WorkScheduleDto>>(WorkScheduleRoute.CreateNextWeek(userId, date.Value));
+        }
+    }
+
+    /// <summary>
+    /// Lấy lịch công tác tuần tiếp theo của lịch đang hiện trên màn hình
+    /// </summary>
+    async Task BtnNext()
+    {
+        message = null;
+        var nextDate = workScheduleDto?.EndDay.AddDays(1);
+        if (nextDate != null)
+        {
+            var resultDto = await client.GetAsync<ResultDto<WorkScheduleDto>>(WorkScheduleRoute.GetByDate(nextDate.Value));
+            if (resultDto != null && resultDto.IsSuccess)
+            {
+                workScheduleDto = resultDto.Dto;
+            }
+            else
+            {
+                //workScheduleDto = new();
+                message = InfoMessage.NotFound("Lịch công tác");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Lây lịch công tác tuần trước của lịch đang hiện trên màn hình
+    /// </summary>
+    /// <returns></returns>
+    async Task BtnBack()
+    {
+        message = null;
+        var backDate = workScheduleDto?.StartDay.AddDays(-1);
+        if(backDate !=null)
+        {
+            var resultDto = await client.GetAsync<ResultDto<WorkScheduleDto>>(WorkScheduleRoute.GetByDate(backDate.Value));
+            if (resultDto != null && resultDto.IsSuccess)
+            {
+                workScheduleDto = resultDto.Dto;
+                //now = workScheduleDto.StartDay;
+            }
+            else
+            {
+                message = InfoMessage.NotFound("Lịch công tác");
+            }
+        }
+    }
+
     async Task SaveWsBtn()
     {
         var list = workScheduleDto?.WorkDays
-            .SelectMany(x => x.WorkShiftDtos!).Where(x => x.IsEdit==true)
+            .SelectMany(x => x.WorkShiftDtos!)
+            .Where(x => x.IsEdit==true)
             .ToList();
         if (list.HasItems())
         {
             var result= await  client.PutAsync<List<WorkShiftDto>,ResultDto<bool>>(WorkScheduleRoute.UpdateList, list!);
             if (result != null && result.IsSuccess)
             {
-                message = "Cập nhật thành công";
+                message = InfoMessage.Success;
             }
             else
             {
-                message = "Cập nhật không thành công";
+                message = InfoMessage.ActionFailed(CRUD.Update,"Lịch công tấc");
             }
         }
     }

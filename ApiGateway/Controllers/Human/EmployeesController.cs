@@ -8,6 +8,8 @@ using DataTranfer.Mapping;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using DataServices.Entities.Human;
+using Microsoft.AspNetCore.Identity;
 
 namespace ApiGateway.Controllers.Human;
 
@@ -17,12 +19,14 @@ namespace ApiGateway.Controllers.Human;
 public class EmployeesController : ControllerBase {
     private readonly BhxhDbContext context;
     private readonly IGenericDapper dapper;
+    private readonly UserManager<ApiUser> userManager;
 
-    public EmployeesController(BhxhDbContext context, IGenericDapper dapper)
+    public EmployeesController(BhxhDbContext context, IGenericDapper dapper, UserManager<ApiUser> userManager)
     {
         this.context = context;
         this.dapper = dapper;
         this.dapper.DbNameType = DatabaseNameType.Employee;
+        this.userManager = userManager;
     }
 
     // GET: api/Employees
@@ -145,7 +149,6 @@ public class EmployeesController : ControllerBase {
                 .OrderBy(s => s.FirstName).ThenBy(s => s.LastName)
                 .Select(s => new EmployeeDtoForListBox(s.Id, $"{s.FirstName} {s.LastName}-{s.Dept!.ShortName}"))
                 .ToListAsync();
-            //FormattableString query = ;
 
             return Ok(ResultExtension.GetResult(result));
         }
@@ -179,7 +182,12 @@ public class EmployeesController : ControllerBase {
             {
                 employee = dto.ToEntity(employee);
                 context.Entry(employee).State = EntityState.Modified;
-                return Ok(Result<bool>.BoolResult(await context.SaveChangesAsync() > 0));
+                var success = await context.SaveChangesAsync() > 0;
+                if (success)
+                {
+                    await CreateEventLogAsync("Update", "Cập nhật nhân viên");
+                    return Ok(Result<bool>.Success(InfoMessage.Success));
+                }
             }
         }
         catch (DbUpdateConcurrencyException)
@@ -202,7 +210,13 @@ public class EmployeesController : ControllerBase {
     public async Task<IActionResult> Create(EmployeeDto dto)
     {
         context.Employees.Add(dto.ToEntity());
-        return Ok(Result<bool>.BoolResult(await context.SaveChangesAsync() > 0));
+        var success = await context.SaveChangesAsync() > 0;
+        if (success)
+        {
+            await CreateEventLogAsync("Create", "Thêm mới nhân viên");
+            return Ok(Result<bool>.BoolResult(success));
+        }
+        return Ok(Result<bool>.Failure("Tạo mới nhân viên thất bại"));
     }
 
     // DELETE: api/Employees/5
@@ -216,6 +230,25 @@ public class EmployeesController : ControllerBase {
         }
         context.Employees.Remove(employee);
         return Ok(Result<bool>.BoolResult(await context.SaveChangesAsync() > 0));
+    }
+
+    private async Task CreateEventLogAsync(string actionName, string description)
+    {
+        var user = await userManager.GetUserAsync(User);
+        if (user != null)
+        {
+            var eventLog = new EventLog
+            {
+                UserId = user.Id,
+                CreateTime = DateTime.Now,
+                IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                Browser = HttpContext.Request.Headers.UserAgent, // Simplified Substring
+                ActionName = actionName,
+                Description = description
+            };
+            context.EventLogs.Add(eventLog);
+            await context.SaveChangesAsync();
+        }
     }
 
     private bool EmployeeExists(int id)

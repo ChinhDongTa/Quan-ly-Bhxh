@@ -1,8 +1,13 @@
 ﻿using ApiGateway.Helpers;
 using DataServices.Data;
+using DataServices.Entities.Human;
 using DataTranfer.Mapping;
+using DefaultValue;
+using DongTa.ResponseMessage;
 using DongTa.ResponseResult;
 using Dtos.Human;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,22 +15,10 @@ namespace ApiGateway.Controllers.Human {
 
     [Route("[controller]")]
     [ApiController]
-    public class WorkSchedulesController(BhxhDbContext context) : ControllerBase {
-
-        /// <summary>
-        /// Lấy danh sách lịch làm việc hiện tại
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("GetCurrent")]
-        public async Task<IActionResult> GetCurrent()
-        {
-            var today = DateOnly.FromDateTime(DateTime.Now);
-            var workSchedule = await context.WorkSchedules
-                .Include(x => x.WorkDays)
-                .ThenInclude(x => x.WorkShifts)
-                .FirstOrDefaultAsync(x => x.StartDay <= today && x.EndDay >= today);
-            return Ok(workSchedule?.ToDto());
-        }
+    [Authorize]
+    public class WorkSchedulesController(BhxhDbContext context, UserManager<ApiUser> userManager) : ControllerBase {
+        private readonly BhxhDbContext context = context;
+        private readonly UserManager<ApiUser> userManager = userManager;
 
         /// <summary>
         /// Lấy danh sách lịch làm việc theo ngày
@@ -36,10 +29,12 @@ namespace ApiGateway.Controllers.Human {
         public async Task<IActionResult> GetByDate(DateOnly date)
         {
             var workSchedule = await context.WorkSchedules
-              .Include(x => x.WorkDays)
-              .ThenInclude(x => x.WorkShifts)
-              .FirstOrDefaultAsync(x => x.StartDay <= date && x.EndDay >= date);
-            return Ok(workSchedule?.ToDto());
+                .Include(x => x.WorkDays)
+                .ThenInclude(x => x.WorkShifts)
+                .Include(x => x.User)
+                .ThenInclude(x => x!.Employee).AsNoTracking()
+                .FirstOrDefaultAsync(x => x.StartDay <= date && x.EndDay >= date);
+            return Ok(ResultExtension.GetResult(workSchedule?.ToDto()));
         }
 
         [HttpGet("GetOne/{Id}")]
@@ -49,7 +44,7 @@ namespace ApiGateway.Controllers.Human {
                 .Include(x => x.WorkDays)
                 .ThenInclude(x => x.WorkShifts)
                 .Include(x => x.User)
-                .ThenInclude(x => x!.Employee)
+                .ThenInclude(x => x!.Employee).AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == Id);
             return Ok(ResultExtension.GetResult(workSchedule?.ToDto()));
         }
@@ -65,20 +60,48 @@ namespace ApiGateway.Controllers.Human {
 
                 context.Entry(workShift).State = EntityState.Modified;
             }
-            return Ok(ResultExtension.GetResult(await context.SaveChangesAsync() > 0));
+            var success = await context.SaveChangesAsync() > 0;
+            if (success)
+            {
+                await CreateEventLogAsync("UpdateList", "Cập nhật lịch làm việc");
+                return Ok(Result<bool>.Success(InfoMessage.Success));
+            }
+
+            return Ok(Result<bool>.Failure("Cập nhật lịch làm việc thất bại"));
         }
 
         [HttpGet("CreateNextWeek/{userId}/{dateOnly}")]
         public async Task<IActionResult> CreateNextWeek(string userId, DateOnly dateOnly)
         {
-            //var userId = HttpContext.User.Identity?.Name;
             if (string.IsNullOrEmpty(userId))
             {
-                return BadRequest("User ID cannot be null or empty.");
+                return Ok(Result<bool>.Failure(new Message(LevelMessage.Error, "Không tìm thấy người dùng")));
             }
 
             await context.InitWorkSchedule(userId, dateOnly);
-            return Ok(true);
+            await CreateEventLogAsync("CreateNextWeek", "Tạo mới lịch làm việc");
+            var date = WorkScheduleHelper.GetNextMonday(dateOnly);
+
+            return await GetByDate(date);
+        }
+
+        private async Task CreateEventLogAsync(string actionName, string description)
+        {
+            var user = await userManager.GetUserAsync(User);
+            if (user != null)
+            {
+                var eventLog = new EventLog
+                {
+                    UserId = user.Id,
+                    CreateTime = DateTime.Now,
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                    Browser = HttpContext.Request.Headers.UserAgent.ToString(),
+                    ActionName = actionName,
+                    Description = description
+                };
+                context.EventLogs.Add(eventLog);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

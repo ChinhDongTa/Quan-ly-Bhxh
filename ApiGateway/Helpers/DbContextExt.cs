@@ -143,4 +143,17 @@ public static class DbContextExt {
     {
         return await dapper.GetOneAsync<int>(SqlQueryString.SelectDeptIdByUserId(userId));
     }
+
+    //public static async Task<bool> CreateEventLog(this BhxhDbContext context, string userId)
+    //{
+    //    var eventLog = new EventLog
+    //    {
+    //        UserId = userId,
+    //         CreateTime = DateTime.Now,
+    //         ActionName = EventType.Create,
+    //        Description = "Tạo mới lịch làm việc",
+    //    };
+    //    context.EventLogs.Add(eventLog);
+    //    return await context.SaveChangesAsync() > 0;
+    //}
 }

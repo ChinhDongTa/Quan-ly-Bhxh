@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using ApiGateway.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,7 @@ builder.Services.AddOpenApi();
 
 var bhxhDbConnectionString = builder.Configuration.GetConnectionString("Employee") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<BhxhDbContext>(options =>
-    options.UseSqlServer(bhxhDbConnectionString));
+    options.UseSqlServer(bhxhDbConnectionString).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
 //Add Dapper connection
 builder.Services.AddScoped<IConnectionStringService, ConnectionStringService>(sp => new ConnectionStringService(builder.Configuration));
@@ -38,6 +39,10 @@ builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<ApiUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<BhxhDbContext>();
+
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen();
 //.AddDefaultTokenProviders()
 //.AddDefaultIdentity<ApiUser>(options =>
 //{
@@ -68,6 +73,13 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 
 app.UseCors("AllowBlazorWasm");
 app.MapIdentityApi<ApiUser>();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+;
 app.UseHttpsRedirection();
 app.UseAuthentication();
 

@@ -149,4 +149,42 @@ public static class SqlQueryString {
         """;
 
     #endregion EmployeeDb
+
+    #region EventLog
+
+    public static string SelectEventLogDto { get; } = $"""
+    SELECT
+        EventLogs.Id,
+        EventLogs.ActionName,
+        EventLogs.Description,
+        EventLogs.CreateTime,
+        EventLogs.Browser,
+        EventLogs.IpAddress,
+        Employees.FirstName + ' ' + Employees.LastName AS EmployeeName,
+        AspNetUsers.UserName
+    FROM
+        AspNetUsers
+        INNER JOIN Employees ON AspNetUsers.EmployeeId = Employees.Id
+        INNER JOIN EventLogs ON AspNetUsers.Id = EventLogs.UserId
+    """;
+
+    public static string SelectEventLogDtoByUserId(string userId) => $"""
+        {SelectEventLogDto}
+        WHERE
+          AspNetUsers.Id = '{userId}'
+        """;
+
+    public static string SelectEventLogDtoByEmployeeId(int employeeId) => $"""
+        {SelectEventLogDto}
+        WHERE
+          Employees.Id = {employeeId}
+        """;
+
+    public static string SelectEventLogDtoByUserName(string userName) => $"""
+        {SelectEventLogDto}
+        WHERE
+          AspNetUsers.UserName = '{userName}'
+        """;
+
+    #endregion EventLog
 }
