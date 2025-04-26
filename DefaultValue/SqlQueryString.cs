@@ -152,39 +152,76 @@ public static class SqlQueryString {
 
     #region EventLog
 
-    public static string SelectEventLogDto { get; } = $"""
-    SELECT
-        EventLogs.Id,
-        EventLogs.ActionName,
-        EventLogs.Description,
-        EventLogs.CreateTime,
-        EventLogs.Browser,
-        EventLogs.IpAddress,
-        Employees.FirstName + ' ' + Employees.LastName AS EmployeeName,
-        AspNetUsers.UserName
-    FROM
-        AspNetUsers
-        INNER JOIN Employees ON AspNetUsers.EmployeeId = Employees.Id
-        INNER JOIN EventLogs ON AspNetUsers.Id = EventLogs.UserId
-    """;
+    //public static string SelectEventLogDto { get; } = $"""
+    //SELECT
+    //    EventLogs.Id,
+    //    EventLogs.ActionName,
+    //    EventLogs.Description,
+    //    EventLogs.CreateTime,
+    //    EventLogs.Browser,
+    //    EventLogs.IpAddress,
+    //    Employees.FirstName + ' ' + Employees.LastName AS EmployeeName,
+    //    AspNetUsers.UserName
+    //FROM
+    //    AspNetUsers
+    //    INNER JOIN Employees ON AspNetUsers.EmployeeId = Employees.Id
+    //    INNER JOIN EventLogs ON AspNetUsers.Id = EventLogs.UserId
+    //""";
 
     public static string SelectEventLogDtoByUserId(string userId) => $"""
-        {SelectEventLogDto}
+        {SelectTopEventLogDto()}
         WHERE
           AspNetUsers.Id = '{userId}'
         """;
 
     public static string SelectEventLogDtoByEmployeeId(int employeeId) => $"""
-        {SelectEventLogDto}
+        {SelectTopEventLogDto()}
         WHERE
           Employees.Id = {employeeId}
         """;
 
     public static string SelectEventLogDtoByUserName(string userName) => $"""
-        {SelectEventLogDto}
+        {SelectTopEventLogDto()}
         WHERE
-          AspNetUsers.UserName = '{userName}'
+          AspNetUsers.UserName like N'%{userName}%'
         """;
+
+    public static string SelectTopEventLogDto(int? top = null)
+    {
+        return top switch
+        {
+            null or <= 0 => $"""
+                SELECT
+                    EventLogs.Id,
+                    EventLogs.ActionName,
+                    EventLogs.Description,
+                    EventLogs.CreateTime,
+                    EventLogs.Browser,
+                    EventLogs.IpAddress,
+                    Employees.FirstName + ' ' + Employees.LastName AS EmployeeName,
+                    AspNetUsers.UserName
+                FROM
+                    AspNetUsers
+                    INNER JOIN Employees ON AspNetUsers.EmployeeId = Employees.Id
+                    INNER JOIN EventLogs ON AspNetUsers.Id = EventLogs.UserId
+            """,
+            _ => $"""
+            SELECT TOP({top})
+                EventLogs.Id,
+                EventLogs.ActionName,
+                EventLogs.Description,
+                EventLogs.CreateTime,
+                EventLogs.Browser,
+                EventLogs.IpAddress,
+                Employees.FirstName + ' ' + Employees.LastName AS EmployeeName,
+                AspNetUsers.UserName
+            FROM
+                AspNetUsers
+                INNER JOIN Employees ON AspNetUsers.EmployeeId = Employees.Id
+                INNER JOIN EventLogs ON AspNetUsers.Id = EventLogs.UserId
+            """
+        };
+    }
 
     #endregion EventLog
 }

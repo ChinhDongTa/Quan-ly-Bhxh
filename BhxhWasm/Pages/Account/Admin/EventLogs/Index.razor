@@ -1,0 +1,61 @@
+﻿@page "/Account/Admin/EventLogs/Index"
+
+@inject IHttpClientBase client
+@attribute [Authorize(Roles = "admin")]
+<LabelHeader Text="Event Logs" />
+<AlertMessage Message="@message" />
+<FluentTextField @bind-Value="username" Label="Username"/>
+<FluentButton Appearance="Appearance.Accent"  @onclick="SearchBtn" IconStart="@(new Icons.Regular.Size20.Search())">
+    @ConstName.BtnSearch
+</FluentButton>
+@if (dtos != null)
+{
+    <EventLogTable Dtos="dtos" />
+}
+else
+{
+    <LoadPage />
+}
+
+@code {
+    IEnumerable<EventLogDto>? dtos;
+    string? message;
+    string? username;
+
+    async Task SearchBtn()
+    {
+        message = null;
+        dtos = null;
+        if (!string.IsNullOrEmpty(username))
+        {
+            var result = await client.GetAsync<ResultDto<EventLogDto>>(EventLogApiRoute.GetByUserName(username));
+            if (result != null && result.IsSuccess)
+            {
+                dtos = result.Dtos;
+            }
+            else
+            {
+                message = result?.Message?.ToString();
+                dtos = Enumerable.Empty<EventLogDto>();
+            }
+        }
+        else
+        {
+            message = InfoMessage.InputEmpty;
+            dtos = Enumerable.Empty<EventLogDto>();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result  = await client.GetAsync<ResultDto<EventLogDto>>(EventLogApiRoute.GetTop());
+        if (result!=null&& result.IsSuccess)
+        {
+            dtos = result.Dtos;
+        }
+        else
+        {
+            message = result?.Message?.ToString();
+        }
+    }
+}

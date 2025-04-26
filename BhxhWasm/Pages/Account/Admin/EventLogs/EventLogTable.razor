@@ -1,0 +1,31 @@
+﻿<table class="bordered">
+    <thead>
+        <tr>
+            <th class="text-center">UserName</th>
+            <th class="text-center">Họ tên</th>
+            <th class="text-center">Hành động</th>
+            <th class="text-center">Chi tiết</th>
+            <th class="text-center">Ngày</th>
+        </tr>
+  </thead>
+    <tbody>
+        @if (Dtos != null)
+        {
+            foreach (var dto in Dtos)
+            {
+                <tr>
+                    <td>@dto.UserName</td>
+                    <td>@dto.EmployeeName</td>
+                    <td>@dto.ActionName</td>
+                    <td>@dto.Description</td>
+                    <td>@dto.CreateTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                </tr>
+            }
+        }
+        </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public IEnumerable<EventLogDto>? Dtos { get; set; }
+}
