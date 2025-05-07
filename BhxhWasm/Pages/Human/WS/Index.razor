@@ -11,7 +11,7 @@
 }
 else
 {
-    <LabelHeader Text=@($"Lịch công tác từ ngày {workScheduleDto.StartDay:dd-MM-yyyy} đến ngày {workScheduleDto.EndDay:dd-MM-yyyy}") />
+    <LabelHeader Text=@($"Lịch làm việc từ ngày {workScheduleDto.StartDay:dd-MM-yyyy} đến ngày {workScheduleDto.EndDay:dd-MM-yyyy}") />
     <AlertMessage Message="@message" />
     <table class="bordered">
         <thead>
@@ -70,7 +70,7 @@ else
             }
         </tbody>
     </table>
-    <label style="padding-bottom:20px">Người tạo: @workScheduleDto.InforUserCreated</label>
+    @* <label style="padding-bottom:20px">Người tạo: @workScheduleDto.InforUserCreated</label> *@
 
     <FluentStack HorizontalGap="10">
         <FluentButton Appearance=Appearance.Neutral IconStart="@(new Icons.Filled.Size24.ArrowCircleLeft().WithColor(Color.Success))" @onclick="BtnBack"></FluentButton>
@@ -122,7 +122,7 @@ else
             var dialog = await DialogService.ShowDialogAsync<EditWorkShiftDialog>(WorkShiftDto, new DialogParameters()
                 {
                     Width = "600px",
-                    Title = $"Updating the {WorkShiftDto.Name} sheet",
+                    Title = $"Cập nhật lịch làm việc",
                     PreventDismissOnOverlayClick = true,
                     PreventScroll = true,
                 });

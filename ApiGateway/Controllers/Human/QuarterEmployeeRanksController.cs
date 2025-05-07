@@ -12,6 +12,7 @@ using DongTa.ResponseResult;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace ApiGateway.Controllers.Human;
 
@@ -21,12 +22,14 @@ namespace ApiGateway.Controllers.Human;
 public class QuarterEmployeeRanksController : ControllerBase {
     private readonly BhxhDbContext context;
     private readonly IGenericDapper dapper;
+    private readonly UserManager<ApiUser> userManager;
 
-    public QuarterEmployeeRanksController(BhxhDbContext context, IGenericDapper dapper)
+    public QuarterEmployeeRanksController(BhxhDbContext context, IGenericDapper dapper, UserManager<ApiUser> userManager)
     {
         this.context = context;
         this.dapper = dapper;
         this.dapper.DbNameType = DatabaseNameType.Employee;
+        this.userManager = userManager;
     }
 
     #region cá nhân
@@ -113,7 +116,17 @@ public class QuarterEmployeeRanksController : ControllerBase {
             {
                 quarterEmployeeRank = dto.ToEntity(quarterEmployeeRank);
                 context.Entry(quarterEmployeeRank).State = EntityState.Modified;
-                return Ok(Result<bool>.BoolResult(await context.SaveChangesAsync() > 0));
+                var success = await context.SaveChangesAsync() > 0;
+                if (success)
+                {
+                    await context.CreateEventLogAsync(await userManager.GetUserAsync(User), HttpContext, ActionBase.Update, $"Cập nhật kết quả xếp loại quý cá nhân có Id={id}");
+                    return Ok(Result<bool>.BoolResult(success));
+                }
+                else
+                {
+                    return Ok(Result<bool>.Failure(Message.Notfound));
+                }
+                //return Ok(Result<bool>.BoolResult(await context.SaveChangesAsync() > 0));
             }
         }
         catch (DbUpdateConcurrencyException)

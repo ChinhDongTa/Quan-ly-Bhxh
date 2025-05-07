@@ -2,7 +2,7 @@
 @inject IHttpClientBase client
 
 <PageTitle>@ConstName.TitleEditStaff</PageTitle>
-<AuthorizeView Roles="tccb,admin">
+<AuthorizeView Roles="tccb,admin" >
     <Authorized>
         <LabelHeader Text="@ConstName.TitleEditStaff" />
         @if (employeeDto is null)
@@ -56,22 +56,21 @@
 
     protected override async Task OnInitializedAsync()
     {
-       
-            if (EmployeeId > 0)
+        if (EmployeeId > 0)
+        {
+            var result = await client.GetAsync<ResultDto<EmployeeDto>>(EmployeeApiRoute.GetOne(EmployeeApiRoute.ControllerName, EmployeeId));
+            if (result != null && result.IsSuccess && result.Dto != null)
             {
-                var result = await client.GetAsync<ResultDto<EmployeeDto>>(EmployeeApiRoute.GetOne(EmployeeApiRoute.ControllerName, EmployeeId));
-                if (result != null && result.IsSuccess && result.Dto != null)
-                {
-                    employeeDto = result.Dto;
-                    ngaySinh = employeeDto.Birthdate;
-                }
+                employeeDto = result.Dto;
+                ngaySinh = employeeDto.Birthdate;
             }
-            else
-            {
-                employeeDto = new() { PostId = 10, Birthdate = DateTime.Now.AddYears(-24) };
-            }
-            //StateHasChanged();
-        
+        }
+        else
+        {
+            employeeDto = new() { PostId = 10, Birthdate = DateTime.Now.AddYears(-24) };
+            ngaySinh = DateTime.Now.AddYears(-24);
+        }
+        //StateHasChanged();
     }
 
     async void SaveStaffBtn()

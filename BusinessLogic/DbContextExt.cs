@@ -1,14 +1,14 @@
 ﻿using DataServices.Data;
 using DataServices.Entities.Human;
-using Dtos.Human;
 using DataTranfer.Mapping;
 using DefaultValue;
 using DongTa.BaseDapper;
 using DongTa.QuarterInYear;
 using DongTa.TypeExtension;
+using Dtos.Human;
 using Microsoft.EntityFrameworkCore;
 
-namespace ApiGateway.Helpers;
+namespace BusinessLogic;
 
 public static class DbContextExt {
 
@@ -100,10 +100,7 @@ public static class DbContextExt {
     {
         // Ensure that Employee is not null before accessing its properties
         return await context.QuarterEmployeeRanks
-            .Where(x => x.Employee != null
-                && x.Employee.DeptId == deptId
-                && x.Quarter == quarter.Quarter
-                && x.Year == quarter.Year)
+            .Where(x => x.Employee != null && x.Employee.DeptId == deptId && x.Quarter == quarter.Quarter && x.Year == quarter.Year)
             .Include(x => x.Employee)
             .Include(x => x.Reward)
             .OrderBy(x => x.Employee!.SortOrder).ThenBy(x => x.Employee!.Birthdate)
@@ -111,7 +108,8 @@ public static class DbContextExt {
             .ToListAsync();
     }
 
-    private static async Task<bool> InitQuarterEmployeeRank(this BhxhDbContext context, int deptId, QuarterInYear quarter)
+    private static async Task<bool> InitQuarterEmployeeRank(
+        this BhxhDbContext context, int deptId, QuarterInYear quarter)
     {
         var currentQuarter = new QuarterInYear();
         if (quarter.Year == currentQuarter.Year && quarter.Quarter > currentQuarter.Quarter)

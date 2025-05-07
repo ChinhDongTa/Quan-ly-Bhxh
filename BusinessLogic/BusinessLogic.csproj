@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataServices\DataServices.csproj" />
+    <ProjectReference Include="..\DataTranfer\DataTranfer.csproj" />
+    <ProjectReference Include="..\DefaultValue\DefaultValue.csproj" />
+    <ProjectReference Include="..\Dtos\Dtos.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DongTa.BaseDapper">
+      <HintPath>..\..\DongTa Library\DongTa.BaseDapper\bin\Release\net9.0\DongTa.BaseDapper.dll</HintPath>
+    </Reference>
+    <Reference Include="DongTa.QuarterInYear">
+      <HintPath>..\..\DongTa Library\DongTa.QuarterInYear\bin\Release\net9.0\DongTa.QuarterInYear.dll</HintPath>
+    </Reference>
+    <Reference Include="DongTa.TypeExtension">
+      <HintPath>..\..\DongTa Library\DongTa.TypeExtension\bin\Release\net8.0\DongTa.TypeExtension.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

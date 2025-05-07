@@ -1,9 +1,9 @@
 ﻿using Blazored.LocalStorage;
-using Dtos.Human;
 using DefaultValue;
 using DefaultValue.ApiRoute;
 using DongTa.ResponseMessage;
 using DongTa.ResponseResult;
+using Dtos.Human;
 using HttpClientBase;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
@@ -11,17 +11,17 @@ using System.Security.Claims;
 namespace BhxhWasm.Services;
 
 public class CustomAuthStateProvider : AuthenticationStateProvider {
-    public readonly IHttpClientBase client;
-    public readonly ISyncLocalStorageService LocalStorage;
+    private readonly IHttpClientBase clientBase;
+    private readonly ISyncLocalStorageService LocalStorage;
 
     public CustomAuthStateProvider(IHttpClientBase httpClient, ISyncLocalStorageService LocalStorage)
     {
-        client = httpClient;
+        clientBase = httpClient;
         this.LocalStorage = LocalStorage;
         var accessToken = LocalStorage.GetItem<string>("accessToken");
         if (accessToken != null)
         {
-            client.SetAuthorizationHeader(accessToken);
+            clientBase.SetAuthorizationHeader(accessToken);
             //new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
         }
     }
@@ -31,7 +31,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
         var user = new ClaimsPrincipal(new ClaimsIdentity());
         try
         {
-            var result = await client.GetAsync<ResultDto<InfoDto>>(AccountApiRoute.Info);
+            var result = await clientBase.GetAsync<ResultDto<InfoDto>>(AccountApiRoute.Info);
             if (result != null && result.Dto != null)
             {
                 var claims = new List<Claim>
@@ -68,14 +68,10 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
     {
         try
         {
-            var response = await client.PostAsync<LoginDto, LoginReponse>("login", loginDto);
+            var response = await clientBase.PostAsync<LoginDto, LoginReponse>("login", loginDto);
             if (response != null)
             {
-                LocalStorage.SetItem("accessToken", response.AccessToken);
-                LocalStorage.SetItem("refreshToken", response.RefreshToken);
-                LocalStorage.SetItem("expiresIn", response.ExpiresIn.ToString());
-                client.SetAuthorizationHeader(response.AccessToken);
-                NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+                SetAuthenticationTokens(response);
                 return new Result<bool>(true, InfoMessage.ActionSuccess(ConstName.Login));
             }
             else
@@ -91,12 +87,27 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
         return new Result<bool>(false, InfoMessage.ActionFailed(ConstName.Login));
     }
 
+    public async Task<Result<bool>> RefreshTokenAsync()
+    {
+        var refreshToken = LocalStorage.GetItem<string>("refreshToken");
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            return new Result<bool>(false, "Token đã hết hạn");
+        }
+
+        var response = await clientBase.PostAsync<RefreshTokenRequest, LoginReponse>("refresh", new RefreshTokenRequest(refreshToken));
+        if (response != null)
+        {
+            SetAuthenticationTokens(response);
+            return new Result<bool>(true, "Success: Refresh Token");
+        }
+        ClearToken();
+        return new Result<bool>(false, "Không thể lấy lại token");
+    }
+
     public void Logout()
     {
-        LocalStorage.RemoveItem("accessToken");
-        LocalStorage.RemoveItem("refreshToken");
-        LocalStorage.RemoveItem("expiresIn");
-        client.SetAuthorizationHeader();
+        ClearToken();
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
@@ -104,7 +115,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
     {
         try
         {
-            var responseMessage = await client.PostAsync<RegisterDto, ResultDto<bool>>(AccountApiRoute.Register, registerDto);
+            var responseMessage = await clientBase.PostAsync<RegisterDto, ResultDto<bool>>(AccountApiRoute.Register, registerDto);
             if (responseMessage != null && responseMessage.IsSuccess)
             {
                 return await LoginAsync(new LoginDto
@@ -124,4 +135,23 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
         }
         return new Result<bool>(false, InfoMessage.ActionFailed(ConstName.Registration));
     }
+
+    private void SetAuthenticationTokens(LoginReponse response)
+    {
+        LocalStorage.SetItem("accessToken", response.AccessToken);
+        LocalStorage.SetItem("refreshToken", response.RefreshToken);
+        LocalStorage.SetItem("expiresIn", response.ExpiresIn.ToString());
+        clientBase.SetAuthorizationHeader(response.AccessToken);
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+    }
+
+    private void ClearToken()
+    {
+        LocalStorage.RemoveItem("accessToken");
+        LocalStorage.RemoveItem("refreshToken");
+        LocalStorage.RemoveItem("expiresIn");
+        clientBase.SetAuthorizationHeader();
+    }
 }
+
+internal record RefreshTokenRequest(string RefreshToken);

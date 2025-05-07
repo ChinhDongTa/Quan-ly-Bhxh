@@ -1,7 +1,5 @@
 ﻿using ApiGateway.Helpers;
 using DataServices.Data;
-using DataServices.Entities.Human;
-using Dtos.Human;
 using DataTranfer.Mapping;
 using DefaultValue;
 using DefaultValue.ApiRoute;
@@ -9,9 +7,10 @@ using DongTa.BaseDapper;
 using DongTa.QuarterInYear;
 using DongTa.ResponseMessage;
 using DongTa.ResponseResult;
+using Dtos.Human;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
 
 namespace ApiGateway.Controllers.Human;
 

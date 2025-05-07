@@ -6,6 +6,11 @@ public static class SqlQueryString {
 
     #region EmployeeDb
 
+    private static string SanitizeInput(string input)
+    {
+        return input.Trim().Replace("'", "''").Replace(" ", ""); // Xóa khoảng trắng và thay thế dấu nháy đơn
+    }
+
     private static readonly string SelectDepartmentDto = $"""
         SELECT
           d.Id,
@@ -20,15 +25,17 @@ public static class SqlQueryString {
           Levels.Name AS LevelName
         FROM
           Departments AS d
-          INNER JOIN Employees ON d.Id = Employees.DeptId
           INNER JOIN Levels ON d.LevelId = Levels.Id
+        WHERE EXISTS (
+          SELECT 1 FROM Employees WHERE Employees.DeptId = d.Id
+        )
         """;
 
     public static string SelectDepartmentDtoByUserId(string userId) => $"""
         {SelectDepartmentDto}
         INNER JOIN AspNetUsers AS a ON a.EmployeeId = Employees.Id
         WHERE
-          a.Id = '{userId}'
+          a.Id = '{SanitizeInput(userId)}'
         """;
 
     public static string SelectDepartmentDtoByEmployeeId(int employeeId) => $"""
@@ -64,7 +71,7 @@ public static class SqlQueryString {
     {
         return $"""
             DECLARE @deptId INT
-            SET @deptId = ({SelectDeptIdByUserId(userId)})
+            SET @deptId = ({SelectDeptIdByUserId(SanitizeInput(userId))})
             {SelectEmployeeDto}
             FROM
               Departments as d
@@ -88,7 +95,7 @@ public static class SqlQueryString {
               INNER JOIN Employees ON Departments.Id = Employees.DeptId
               INNER JOIN AspNetUsers ON AspNetUsers.EmployeeId = Employees.Id
             WHERE
-              (AspNetUsers.Id = '{userId}')
+              (AspNetUsers.Id = '{SanitizeInput(userId)}')
             """;
 
     public static string SelectTop3QuarterEmployeeRank(int employeeId, QuarterInYear q1, QuarterInYear q2, QuarterInYear q3) => $"""
@@ -125,7 +132,7 @@ public static class SqlQueryString {
               INNER JOIN SalaryCoefficients as s ON e.SalaryCoefficientId = s.Id
               INNER JOIN AspNetUsers ON e.Id = AspNetUsers.EmployeeId
             WHERE
-              AspNetUsers.Id = '{userId}'
+              AspNetUsers.Id = '{SanitizeInput(userId)}'
             """;
     }
 
@@ -152,38 +159,25 @@ public static class SqlQueryString {
 
     #region EventLog
 
-    //public static string SelectEventLogDto { get; } = $"""
-    //SELECT
-    //    EventLogs.Id,
-    //    EventLogs.ActionName,
-    //    EventLogs.Description,
-    //    EventLogs.CreateTime,
-    //    EventLogs.Browser,
-    //    EventLogs.IpAddress,
-    //    Employees.FirstName + ' ' + Employees.LastName AS EmployeeName,
-    //    AspNetUsers.UserName
-    //FROM
-    //    AspNetUsers
-    //    INNER JOIN Employees ON AspNetUsers.EmployeeId = Employees.Id
-    //    INNER JOIN EventLogs ON AspNetUsers.Id = EventLogs.UserId
-    //""";
-
     public static string SelectEventLogDtoByUserId(string userId) => $"""
         {SelectTopEventLogDto()}
         WHERE
-          AspNetUsers.Id = '{userId}'
+          AspNetUsers.Id = '{SanitizeInput(userId)}'
+        ORDER BY EventLogs.CreateTime DESC
         """;
 
     public static string SelectEventLogDtoByEmployeeId(int employeeId) => $"""
         {SelectTopEventLogDto()}
         WHERE
           Employees.Id = {employeeId}
+        ORDER BY EventLogs.CreateTime DESC
         """;
 
     public static string SelectEventLogDtoByUserName(string userName) => $"""
         {SelectTopEventLogDto()}
         WHERE
           AspNetUsers.UserName like N'%{userName}%'
+          ORDER BY EventLogs.CreateTime DESC
         """;
 
     public static string SelectTopEventLogDto(int? top = null)
@@ -219,6 +213,7 @@ public static class SqlQueryString {
                 AspNetUsers
                 INNER JOIN Employees ON AspNetUsers.EmployeeId = Employees.Id
                 INNER JOIN EventLogs ON AspNetUsers.Id = EventLogs.UserId
+            Order by EventLogs.CreateTime DESC
             """
         };
     }

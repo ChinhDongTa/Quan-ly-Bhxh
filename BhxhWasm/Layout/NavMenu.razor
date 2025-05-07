@@ -2,12 +2,12 @@
     <Authorized>
         <div class="navmenu">
             <input type="checkbox" title="Menu expand/collapse toggle" id="navmenu-toggle" class="navmenu-icon" />
-            <label for="navmenu-toggle" class="navmenu-icon"><FluentIcon Value="@(new Icons.Regular.Size20.Navigation())" Color="Color.Fill" /></label>
+            <label for="navmenu-toggle" class="navmenu-icon"><FluentIcon Value="@(new Icons.Regular.Size24.Navigation())" Color="Color.Fill" /></label>
             <nav class="sitenav" aria-labelledby="main-menu" onclick="document.getElementById('navmenu-toggle').click();">
                 <FluentNavMenu Id="main-menu" Width="250" Collapsible="true" Title="Navigation menu" @bind-Expanded="expanded">
-                    <FluentNavLink Href="/" Match="NavLinkMatch.All" Icon="@(new Icons.Regular.Size20.Home())" IconColor="Color.Accent">Home</FluentNavLink>
-                    <FluentNavLink Href="counter" Icon="@(new Icons.Regular.Size20.NumberSymbolSquare())" IconColor="Color.Accent">Counter</FluentNavLink>
-                    <FluentNavLink Href="weather" Icon="@(new Icons.Regular.Size20.WeatherPartlyCloudyDay())" IconColor="Color.Accent">Weather</FluentNavLink>
+                    <FluentNavLink Href="/" Match="NavLinkMatch.All" Icon="@(new Icons.Regular.Size24.Home())" IconColor="Color.Accent">Home</FluentNavLink>
+                    <FluentNavLink Href="counter" Icon="@(new Icons.Regular.Size24.NumberSymbolSquare())" IconColor="Color.Accent">Counter</FluentNavLink>
+                    <FluentNavLink Href="Human/WS/Index" Icon="@(new Icons.Regular.Size24.CalendarWorkWeek())" IconColor="Color.Accent">Lịch làm việc</FluentNavLink>
                     <FluentNavGroup Title="Quản lý nhân sự" Icon="@(new Icons.Regular.Size24.PeopleList())">
                         <FluentNavLink Href="/Human/Employee/Search" Icon="@(new Icons.Regular.Size24.SearchInfo())">Tìm nhân viên</FluentNavLink>
                         <FluentNavLink Href="/Human/Employee/Birthday" Icon="@(new Icons.Regular.Size24.SearchInfo())">Sinh nhật</FluentNavLink>
@@ -24,7 +24,7 @@
                         <FluentNavLink Href="/Human/XepLoaiQuy/TongHopNam" Icon="@(new Icons.Regular.Size24.List())" Tooltip="Tổng hợp kết quả xếp loại quý cả năm">Tổng hợp cả năm</FluentNavLink>
                     </FluentNavGroup>
 
-                    <FluentNavGroup Title="Account (for administrators)" Icon="@(new Icons.Regular.Size20.Toolbox())">
+                    <FluentNavGroup Title="Account (for administrators)" Icon="@(new Icons.Regular.Size24.Toolbox())">
                         <FluentNavLink Href="/Account/Admin/Index" Icon="@(new Icons.Regular.Size24.Edit())">Admin page</FluentNavLink>
                         <FluentNavLink Href="/Bots/index" Icon="@(new Icons.Regular.Size24.List())">Bots account</FluentNavLink>
                         <FluentNavLink Href="/Account/Admin/EventLogs/Index" Icon="@(new Icons.Regular.Size24.History())">Event log</FluentNavLink>
@@ -33,9 +33,6 @@
             </nav>
         </div>
     </Authorized>
-    <NotAuthorized>
-        <AlertMessage Message=@InfoMessage.NotAuthorized />
-    </NotAuthorized>
 </AuthorizeView>
 
 @code {

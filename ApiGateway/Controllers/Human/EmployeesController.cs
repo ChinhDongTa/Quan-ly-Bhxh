@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using DataServices.Entities.Human;
 using Microsoft.AspNetCore.Identity;
+using ApiGateway.Helpers;
 
 namespace ApiGateway.Controllers.Human;
 
@@ -185,7 +186,7 @@ public class EmployeesController : ControllerBase {
                 var success = await context.SaveChangesAsync() > 0;
                 if (success)
                 {
-                    await CreateEventLogAsync("Update", "Cập nhật nhân viên");
+                    await context.CreateEventLogAsync(await userManager.GetUserAsync(User), HttpContext, ActionBase.Update, $"Cập nhật nhân viên có ID={id}");
                     return Ok(Result<bool>.Success(InfoMessage.Success));
                 }
             }
@@ -213,7 +214,7 @@ public class EmployeesController : ControllerBase {
         var success = await context.SaveChangesAsync() > 0;
         if (success)
         {
-            await CreateEventLogAsync("Create", "Thêm mới nhân viên");
+            await context.CreateEventLogAsync(await userManager.GetUserAsync(User), HttpContext, ActionBase.Create, $"Thêm mới nhân viên {dto.FirstName} {dto.LastName}");
             return Ok(Result<bool>.BoolResult(success));
         }
         return Ok(Result<bool>.Failure("Tạo mới nhân viên thất bại"));
@@ -229,26 +230,13 @@ public class EmployeesController : ControllerBase {
             return Ok(Result<bool>.Failure(DongTa.ResponseMessage.Message.Notfound));
         }
         context.Employees.Remove(employee);
-        return Ok(Result<bool>.BoolResult(await context.SaveChangesAsync() > 0));
-    }
-
-    private async Task CreateEventLogAsync(string actionName, string description)
-    {
-        var user = await userManager.GetUserAsync(User);
-        if (user != null)
+        var success = await context.SaveChangesAsync() > 0;
+        if (success)
         {
-            var eventLog = new EventLog
-            {
-                UserId = user.Id,
-                CreateTime = DateTime.Now,
-                IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
-                Browser = HttpContext.Request.Headers.UserAgent, // Simplified Substring
-                ActionName = actionName,
-                Description = description
-            };
-            context.EventLogs.Add(eventLog);
-            await context.SaveChangesAsync();
+            await context.CreateEventLogAsync(await userManager.GetUserAsync(User), HttpContext, ActionBase.Delete, $"Xóa nhân viên có ID={id}");
+            return Ok(Result<bool>.BoolResult(success));
         }
+        return Ok(Result<bool>.Failure("Không thể xóa nhân viên"));
     }
 
     private bool EmployeeExists(int id)

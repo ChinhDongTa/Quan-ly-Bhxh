@@ -47,5 +47,5 @@ public interface IHttpClientBase {
     /// <returns></returns>
     Task<Stream?> PostAndDownloadAsync<TRequest>(string url, TRequest data);
 
-    void SetAuthorizationHeader(string? token = null, string tokenType = "Bearer");
+    public void SetAuthorizationHeader(string? token = null, string tokenType = "Bearer");
 }

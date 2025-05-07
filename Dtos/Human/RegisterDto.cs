@@ -20,5 +20,5 @@ public record RegisterDto {
     public string ConfirmPassword { get; set; } = "";
     [Required]
     public int EmployeeId { get; set; }
-    public string RoleId { get; set; } = "5d68e094-aeef-4eda-8bac-6d3ae58b3016";//Viewer
+    public string RoleId { get; set; } = "5d68e094-aeef-4eda-8bac-6d3ae58b3016";//viewer
 }

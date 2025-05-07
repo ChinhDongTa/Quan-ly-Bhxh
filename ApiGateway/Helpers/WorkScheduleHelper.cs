@@ -13,7 +13,7 @@ public static class WorkScheduleHelper {
     /// <param name="date">ngày hiện tại hoặc ngày bất kỳ muốn tạo lịch cho tuần tiếp theo</param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public static async Task InitWorkSchedule(this BhxhDbContext context, string userId, DateOnly? date)
+    public static async Task<int> InitWorkSchedule(this BhxhDbContext context, string userId, DateOnly? date)
     {
         // Fix for CS0201: Assign the result of the null-coalescing operation to nextMonday
         date ??= DateOnly.FromDateTime(DateTime.Now);
@@ -21,7 +21,7 @@ public static class WorkScheduleHelper {
         // Nếu đã có lịch làm việc cho tuần này thì không tạo mới
         if (context.WorkSchedules.Any(x => x.EndDay >= nextMonday))
         {
-            return;
+            return -1;
         }
         WorkSchedule workSchedule = new()
         {
@@ -109,10 +109,12 @@ public static class WorkScheduleHelper {
             };
             workDay.WorkShifts.Add(afternoon);
         }
-        await context.SaveChangesAsync();
+        if (await context.SaveChangesAsync() > 0)
+            return workSchedule.Id;
+        return -1;
     }
 
-    public static DateOnly GetNextMonday(DateOnly date)
+    private static DateOnly GetNextMonday(DateOnly date)
     {
         int daysToAdd = (7 - (int)date.DayOfWeek + 1) % 7;
         if (daysToAdd == 0)
