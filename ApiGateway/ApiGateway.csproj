@@ -42,7 +42,6 @@
     <ProjectReference Include="..\DataServices\DataServices.csproj" />
     <ProjectReference Include="..\DataTranfer\DataTranfer.csproj" />
     <ProjectReference Include="..\DefaultValue\DefaultValue.csproj" />
-    <ProjectReference Include="..\Quan ly Bhxh.ServiceDefaults\Quan ly Bhxh.ServiceDefaults.csproj" />
   </ItemGroup>
 
   <ItemGroup>

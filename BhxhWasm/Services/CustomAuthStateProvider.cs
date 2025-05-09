@@ -18,11 +18,15 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
     {
         clientBase = httpClient;
         this.LocalStorage = LocalStorage;
+        //var accessToken = LocalStorage.GetItem<string>("accessToken");
         var accessToken = LocalStorage.GetItem<string>("accessToken");
+        if (!string.IsNullOrEmpty(accessToken))
+        {
+            clientBase.SetAuthorizationHeader(accessToken);
+        }
         if (accessToken != null)
         {
             clientBase.SetAuthorizationHeader(accessToken);
-            //new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
         }
     }
 

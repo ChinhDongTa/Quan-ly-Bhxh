@@ -27,25 +27,64 @@ public class WorkSchedulesController(BhxhDbContext context, UserManager<ApiUser>
     [HttpGet("GetByDate/{date}")]
     public async Task<IActionResult> GetByDate(DateOnly date)
     {
-        var workSchedule = await context.WorkSchedules
-            .Include(x => x.WorkDays)
-            .ThenInclude(x => x.WorkShifts)
-            .Include(x => x.User)
-            .ThenInclude(x => x!.Employee)
-            .FirstOrDefaultAsync(x => x.StartDay <= date && x.EndDay >= date);
-        return Ok(ResultExtension.GetResult(workSchedule?.ToDto()));
+        var workScheduleDto = await context.WorkSchedules
+            .Include(ws => ws.WorkDays)
+                .ThenInclude(wd => wd.WorkShifts)
+            .Include(ws => ws.User)
+                .ThenInclude(u => u!.Employee)
+            .Where(ws => ws.StartDay <= date && ws.EndDay >= date)
+            .Select(ws => new WorkScheduleDto
+            {
+                Id = ws.Id,
+                StartDay = ws.StartDay,
+                EndDay = ws.EndDay,
+                UserId = ws.UserId,
+                InforUserCreated = $"{ws.User!.Employee!.FirstName} {ws.User.Employee.LastName}", // Assuming Employee is a navigation property
+                WorkDays = ws.WorkDays.Select(wd => new WorkDayDto
+                {
+                    Id = wd.Id,
+                    Date = wd.Date,
+                    WorkShiftDtos = wd.WorkShifts!.Select(wsf => new WorkShiftDto
+                    {
+                        Id = wsf.Id,
+                        Name = wsf.Name,
+                        Description = wsf.Description
+                    }).ToList()
+                }).ToList()
+            }).FirstOrDefaultAsync();
+
+        return Ok(ResultExtension.GetResult(workScheduleDto));
     }
 
     [HttpGet("GetOne/{Id}")]
     public async Task<IActionResult> GetOne(int Id)
     {
-        var workSchedule = await context.WorkSchedules
-            .Include(x => x.WorkDays)
-            .ThenInclude(x => x.WorkShifts)
-            .Include(x => x.User)
-            .ThenInclude(x => x!.Employee)
-            .FirstOrDefaultAsync(x => x.Id == Id);
-        return Ok(ResultExtension.GetResult(workSchedule?.ToDto()));
+        var workScheduleDto = await context.WorkSchedules
+           .Include(ws => ws.WorkDays)
+               .ThenInclude(wd => wd.WorkShifts)
+           .Include(ws => ws.User)
+               .ThenInclude(u => u!.Employee).
+               Where(ws => ws.Id == Id)
+           .Select(ws => new WorkScheduleDto
+           {
+               Id = ws.Id,
+               StartDay = ws.StartDay,
+               EndDay = ws.EndDay,
+               UserId = ws.UserId,
+               InforUserCreated = $"{ws.User!.Employee!.FirstName} {ws.User.Employee.LastName}", // Assuming Employee is a navigation property
+               WorkDays = ws.WorkDays.Select(wd => new WorkDayDto
+               {
+                   Id = wd.Id,
+                   Date = wd.Date,
+                   WorkShiftDtos = wd.WorkShifts!.Select(wsf => new WorkShiftDto
+                   {
+                       Id = wsf.Id,
+                       Name = wsf.Name,
+                       Description = wsf.Description
+                   }).ToList()
+               }).ToList()
+           }).FirstOrDefaultAsync(x => x.Id == Id);
+        return Ok(ResultExtension.GetResult(workScheduleDto));
     }
 
     [HttpPut("UpdateList")]

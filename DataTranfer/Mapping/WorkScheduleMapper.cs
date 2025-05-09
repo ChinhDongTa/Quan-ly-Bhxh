@@ -12,8 +12,6 @@ public static class WorkScheduleMapper {
             Id = workShift.Id,
             Name = workShift.Name,
             Description = workShift.Description,
-            WorkDayId = workShift.WorkDayId,
-            DateString = workShift.WorkDay?.Date.ToString("dd/MM/yyyy") // Ngày làm việc: Thứ hai 18/04/2025
         };
     }
 
@@ -25,15 +23,13 @@ public static class WorkScheduleMapper {
             {
                 Description = workShiftDto.Description,
                 Id = workShiftDto.Id,
-                Name = workShiftDto.Name,
-                WorkDayId = workShiftDto.WorkDayId
+                Name = workShiftDto.Name
             };
         }
         else
         {
             workShift.Description = workShiftDto.Description;
             workShift.Name = workShiftDto.Name;
-            workShift.WorkDayId = workShiftDto.WorkDayId;
             return workShift;
         }
     }
@@ -45,7 +41,6 @@ public static class WorkScheduleMapper {
             Id = workDay.Id,
             Date = workDay.Date,
             WorkShiftDtos = workDay.WorkShifts?.Select(x => x.ToDto()).ToList(),
-            WorkScheduleId = workDay.WorkScheduleId,
         };
     }
 
@@ -57,13 +52,11 @@ public static class WorkScheduleMapper {
             {
                 Id = workDayDto.Id,
                 Date = workDayDto.Date,
-                WorkScheduleId = workDayDto.WorkScheduleId
             };
         }
         else
         {
             workDay.Date = workDayDto.Date;
-            workDay.WorkScheduleId = workDayDto.WorkScheduleId;
             return workDay;
         }
     }

@@ -145,6 +145,15 @@ else
         if (userId != null && date != null)
         {
             var resultDto = await client.GetAsync<ResultDto<WorkScheduleDto>>(WorkScheduleRoute.CreateNextWeek(userId, date.Value));
+            if (resultDto != null && resultDto.IsSuccess)
+            {
+                workScheduleDto = resultDto.Dto;
+                message = InfoMessage.Success;
+            }
+            else
+            {
+                message = InfoMessage.ActionFailed(CRUD.Create, "Lịch công tác");
+            }
         }
     }
 
@@ -199,6 +208,7 @@ else
             .SelectMany(x => x.WorkShiftDtos!)
             .Where(x => x.IsEdit==true)
             .ToList();
+
         if (list.HasItems())
         {
             var result= await  client.PutAsync<List<WorkShiftDto>,ResultDto<bool>>(WorkScheduleRoute.UpdateList, list!);

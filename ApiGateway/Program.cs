@@ -1,4 +1,4 @@
-using DataServices.Data;
+﻿using DataServices.Data;
 using DataServices.Entities.Human;
 using DongTa.BaseDapper;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -7,8 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.AddServiceDefaults();
 
 // Add services to the container.
 
@@ -23,17 +21,6 @@ builder.Services.AddDbContext<BhxhDbContext>(options =>
 //Add Dapper connection
 builder.Services.AddScoped<IConnectionStringService, ConnectionStringService>(sp => new ConnectionStringService(builder.Configuration));
 builder.Services.AddScoped<IGenericDapper, GenericDapper>();
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowBlazorWasm",
-        policy =>
-        {
-            policy.WithOrigins("https://localhost:7293")
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();
-        });
-});
 
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<ApiUser>()
@@ -55,9 +42,19 @@ builder.Services.AddSwaggerGen();
 //    options.Password.RequireUppercase = false;
 //});
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy =>
+        {
+            policy.AllowAnyOrigin() // Cho phép tất cả nguồn gốc
+                  .AllowAnyMethod() // Cho phép tất cả phương thức HTTP
+                  .AllowAnyHeader(); // Cho phép tất cả header
+        });
+});
 var app = builder.Build();
 
-app.MapDefaultEndpoints();
+app.UseCors("AllowAll");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -71,7 +68,6 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
-app.UseCors("AllowBlazorWasm");
 app.MapIdentityApi<ApiUser>();
 
 if (app.Environment.IsDevelopment())
