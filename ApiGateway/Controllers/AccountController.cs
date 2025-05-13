@@ -47,7 +47,7 @@ namespace ApiGateway.Controllers {
                     {
                         return BadRequest(addRoleresult.Errors);
                     }
-                    return Ok(Result<bool>.Success(InfoMessage.ActionSuccess(ConstName.Registration)));
+                    return Ok(Result<bool>.Success(InfoMessage.ActionSuccess(CRUD.Create, ConstName.Registration)));
                 }
                 return BadRequest(result.Errors);
             }

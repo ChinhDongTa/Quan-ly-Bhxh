@@ -4,19 +4,18 @@
 /// Tiêu đề 1 trang web hoặc tên của 1 component
 /// </summary>
 public record ConstName {
-    public const string TitleEditStaff = "Cập nhật nhân viên";
-    public const string TitleDtts = "Danh sách dân tộc thiểu số";
-    public const string BtnSave = "Lưu";
-    public const string BtnSearch = "Tìm";
-    public const string BtnDownload = "Tải file";
-    public const string BtnBack = "Quay lại";
-    public const string BtnCancel = "Bỏ qua";
-    public const string BtnClose = "Đóng";
-    public const string Detail = "Chi tiết";
-    public const string Edit = "Cập nhật";
-    public const string Add = "Tạo mới";
-    public const string Delete = "Xóa";
-    public const string UploadFolder = "Uploads";
-    public const string Login = "Đăng nhập";
-    public const string Registration = "Ghi danh tài khoản";
+    public static string TitleEditStaff => Resources.TitleEditStaff;
+    public static string Logout => Resources.Logout;
+    public static string BtnSave => Resources.BtnSave;
+    public static string BtnSearch => Resources.BtnSearch;
+    public static string BtnDownload => Resources.BtnDownload;
+    public static string BtnBack => Resources.BtnBack;
+    public static string BtnCancel => Resources.BtnCancel;
+    public static string BtnClose => Resources.BtnClose;
+    public static string Detail => Resources.Detail;
+    public static string Edit => Resources.Edit;
+    public static string Add => Resources.Add;
+    public static string Delete => Resources.Delete;
+    public static string Login => Resources.Login;
+    public static string Registration => Resources.Registration;
 }

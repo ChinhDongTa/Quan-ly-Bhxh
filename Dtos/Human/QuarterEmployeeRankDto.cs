@@ -2,6 +2,7 @@
 
 public record QuarterEmployeeRankDto {
     public int Id { get; set; }
+    public int DeptId { get; set; }
     public int EmployeeId { get; set; }
     public string? EmployeeName { get; set; }
     public int RewardId { get; set; }

@@ -6,7 +6,7 @@
  <AuthorizeView>
     <Authorized>
         Hello, @context.User.Identity?.Name!
-        <FluentButton Appearance="Appearance.Accent" @onclick="BeginLogOut">Log out</FluentButton>
+        <FluentButton Appearance="Appearance.Accent" @onclick="BeginLogOut">@DefaultValue.ConstName.Logout</FluentButton>
     </Authorized>
     <NotAuthorized>
         <FluentAnchor Appearance="Appearance.Neutral"  Href="Account/Login">Login</FluentAnchor> -

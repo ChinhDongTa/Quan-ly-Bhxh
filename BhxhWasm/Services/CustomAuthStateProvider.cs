@@ -24,48 +24,42 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
         {
             clientBase.SetAuthorizationHeader(accessToken);
         }
-        if (accessToken != null)
-        {
-            clientBase.SetAuthorizationHeader(accessToken);
-        }
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var user = new ClaimsPrincipal(new ClaimsIdentity());
-        try
+        var infoDto = GetInfoDtoFromLocalStorage();
+        if (infoDto != null)
         {
-            var result = await clientBase.GetAsync<ResultDto<InfoDto>>(AccountApiRoute.Info);
-            if (result != null && result.Dto != null)
+            var user = CreateClaimsPrincipal(infoDto);
+            return new AuthenticationState(user);
+        }
+        else
+        {
+            try
             {
-                var claims = new List<Claim>
+                var result = await clientBase.GetAsync<ResultDto<InfoDto>>(AccountApiRoute.Info);
+                if (result != null && result.Dto != null)
                 {
-                    new(ClaimTypes.NameIdentifier, result.Dto.Id),
-                    new(ClaimTypes.Name, result.Dto.Username),
-                    new(ClaimTypes.Email, result.Dto.Email)
-                };
-
-                // Fix for CS1503: Convert IEnumerable<string> RoleNames to individual claims
-                if (result.Dto.RoleNames != null)
-                {
-                    claims.AddRange(result.Dto.RoleNames.Select(role => new Claim(ClaimTypes.Role, role)));
+                    SetInfoDto(result.Dto);
+                    var user = CreateClaimsPrincipal(result.Dto);
+                    return new AuthenticationState(user);
                 }
-
-                var identity = new ClaimsIdentity(claims, "Token");
-                user = new ClaimsPrincipal(identity);
-                return new AuthenticationState(user);
+                else
+                {
+                    ClearInfoDto();
+                    Console.WriteLine($"Error fetching user info");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching user info");
+                Console.WriteLine($"Error fetching user info: {ex.Message}");
+                ClearInfoDto();
             }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error fetching user info: {ex.Message}");
-        }
 
-        return new AuthenticationState(user);
+        // Return an unauthenticated state if no valid user information is found
+        return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
     }
 
     public async Task<Result<bool>> LoginAsync(LoginDto loginDto)
@@ -76,7 +70,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
             if (response != null)
             {
                 SetAuthenticationTokens(response);
-                return new Result<bool>(true, InfoMessage.ActionSuccess(ConstName.Login));
+                return new Result<bool>(true, InfoMessage.ActionSuccess(CRUD.Read, ConstName.Login));
             }
             else
             {
@@ -88,7 +82,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
             Console.WriteLine($"Error during login: {ex.Message}");
         }
 
-        return new Result<bool>(false, InfoMessage.ActionFailed(ConstName.Login));
+        return new Result<bool>(false, InfoMessage.ActionFailed(CRUD.Read, ConstName.Login));
     }
 
     public async Task<Result<bool>> RefreshTokenAsync()
@@ -96,7 +90,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
         var refreshToken = LocalStorage.GetItem<string>("refreshToken");
         if (string.IsNullOrEmpty(refreshToken))
         {
-            return new Result<bool>(false, "Token đã hết hạn");
+            return new Result<bool>(false, "Error: Token expired. Please log in again.");
         }
 
         var response = await clientBase.PostAsync<RefreshTokenRequest, LoginReponse>("refresh", new RefreshTokenRequest(refreshToken));
@@ -106,7 +100,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
             return new Result<bool>(true, "Success: Refresh Token");
         }
         ClearToken();
-        return new Result<bool>(false, "Không thể lấy lại token");
+        return new Result<bool>(false, "Error: Unable to refresh token. Please log in again.");
     }
 
     public void Logout()
@@ -130,14 +124,14 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
             }
             else
             {
-                return new Result<bool>(false, InfoMessage.ActionFailed(ConstName.Registration));
+                return new Result<bool>(false, InfoMessage.ActionFailed(CRUD.Create, ConstName.Registration));
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error during registration: {ex.Message}");
         }
-        return new Result<bool>(false, InfoMessage.ActionFailed(ConstName.Registration));
+        return new Result<bool>(false, InfoMessage.ActionFailed(CRUD.Create, ConstName.Registration));
     }
 
     private void SetAuthenticationTokens(LoginReponse response)
@@ -147,6 +141,65 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
         LocalStorage.SetItem("expiresIn", response.ExpiresIn.ToString());
         clientBase.SetAuthorizationHeader(response.AccessToken);
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+    }
+
+    private void SetInfoDto(InfoDto infoDto)
+    {
+        LocalStorage.SetItem("Id", infoDto.Id);
+        LocalStorage.SetItem("Email", infoDto.Email);
+        LocalStorage.SetItem("Username", infoDto.Username);
+        LocalStorage.SetItem("RoleNames", infoDto.RoleNames);
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+    }
+
+    private void ClearInfoDto()
+    {
+        LocalStorage.RemoveItem("Id");
+        LocalStorage.RemoveItem("Email");
+        LocalStorage.RemoveItem("Username");
+        LocalStorage.RemoveItem("RoleNames");
+    }
+
+    private static ClaimsPrincipal CreateClaimsPrincipal(InfoDto infoDto)
+    {
+        var claims = new List<Claim>
+    {
+        new(ClaimTypes.NameIdentifier, infoDto.Id),
+        new(ClaimTypes.Name, infoDto.Username),
+        new(ClaimTypes.Email, infoDto.Email)
+    };
+
+        if (infoDto.RoleNames != null)
+        {
+            claims.AddRange(infoDto.RoleNames.Select(role => new Claim(ClaimTypes.Role, role)));
+        }
+
+        var identity = new ClaimsIdentity(claims, "Token");
+        return new ClaimsPrincipal(identity);
+    }
+
+    private InfoDto? GetInfoDtoFromLocalStorage()
+    {
+        var id = LocalStorage.GetItem<string>("Id");
+        var email = LocalStorage.GetItem<string>("Email");
+        var username = LocalStorage.GetItem<string>("Username");
+        var roleNames = LocalStorage.GetItem<IEnumerable<string>>("RoleNames");
+        if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(username))
+        {
+            return null;
+        }
+        // Kiểm tra định dạng email
+        if (!email.Contains('@'))
+        {
+            return null;
+        }
+        return new InfoDto
+        {
+            Id = id,
+            Email = email,
+            Username = username,
+            RoleNames = roleNames
+        };
     }
 
     private void ClearToken()

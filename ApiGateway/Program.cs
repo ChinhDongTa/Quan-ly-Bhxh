@@ -1,6 +1,7 @@
 ﻿using DataServices.Data;
 using DataServices.Entities.Human;
 using DongTa.BaseDapper;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -61,6 +62,28 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
+    app.UseExceptionHandler(errorApp =>
+    {
+        errorApp.Run(async context =>
+        {
+            context.Response.StatusCode = 500;
+            context.Response.ContentType = "application/json";
+
+            var error = context.Features.Get<IExceptionHandlerFeature>();
+            if (error != null)
+            {
+                var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+                logger.LogError(error.Error, "Unhandled exception occurred.");
+
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    success = false,
+                    message = "An unexpected error occurred.",
+                    details = error.Error.ToString() // Include stack trace in development
+                });
+            }
+        });
+    });
 }
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -82,5 +105,50 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.ContentType = "application/json";
+
+        var error = context.Features.Get<IExceptionHandlerFeature>();
+        if (error != null)
+        {
+            var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+            logger.LogError(error.Error, "Unhandled exception occurred.");
+
+            var statusCode = error.Error switch
+            {
+                KeyNotFoundException => 404, // Not Found
+                UnauthorizedAccessException => 401, // Unauthorized
+                _ => 500 // Internal Server Error
+            };
+
+            context.Response.StatusCode = statusCode;
+
+            await context.Response.WriteAsJsonAsync(new
+            {
+                success = false,
+                message = statusCode == 500 ? "An unexpected error occurred." : error.Error.Message,
+                details = statusCode == 500 ? null : error.Error.StackTrace // Optional
+            });
+        }
+    });
+});
+
+app.UseStatusCodePages(async context =>
+{
+    var response = context.HttpContext.Response;
+
+    if (response.StatusCode == 401 || response.StatusCode == 403)
+    {
+        response.ContentType = "application/json";
+        await response.WriteAsJsonAsync(new
+        {
+            success = false,
+            message = response.StatusCode == 401 ? "Unauthorized access." : "Forbidden access."
+        });
+    }
+});
 
 app.Run();

@@ -1,9 +1,9 @@
 ﻿namespace Dtos.Human;
 
 public record SalaryCoefficientDto {
-    public int Id { get; set; }
+    public required int Id { get; set; }
 
-    public string Name { get; set; } = null!;
+    public required string Name { get; set; }
 
     public string? Description { get; set; }
 }

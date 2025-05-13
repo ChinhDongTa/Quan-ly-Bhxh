@@ -94,7 +94,7 @@
         var result = (await client.GetAsync<ResultDto<QuarterDepartmentRankDto>>(QuarterDepartmentRankApiRoute.GetByQuarter((byte)quarter, year)))?.Dtos;
         if (result is null)
         {
-            message = InfoMessage.ActionFailed("Lấy ds xếp loại quý đơn vị");
+            message = InfoMessage.ActionFailed(CRUD.Read,"Lấy ds xếp loại quý đơn vị");
             return Enumerable.Empty<QuarterDepartmentRankDto>();
         }
         else
