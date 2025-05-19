@@ -15,6 +15,7 @@
             <FluentValidationSummary class="text-danger" role="alert" />
 
             <FluentStack Orientation="Orientation.Vertical">
+                <EmployeeTreeView />
                 <SelectListEmployee @bind-Item="employeeDto" Label="Chọn nhân viên" />
                 <FluentTextField Name="registerDto.Email" @bind-Value="registerDto.Email" AutoComplete="username" Required="true" Placeholder="name@example.com" Label="Email" Style="width: 100%" />
                 <FluentValidationMessage For="() => registerDto.Email" class="text-danger" />
@@ -25,6 +26,8 @@
                 <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" Style="width: 100%">@ConstName.Registration</FluentButton>
             </FluentStack>
         </EditForm>
+       
+       
     </FluentGridItem>
     <FluentGridItem xs="12" sm="8">
         <h3>Use another service to log in.</h3>
@@ -38,6 +41,7 @@
     RegisterDto registerDto = new RegisterDto();
     private string? Message;
     EmployeeDtoForListBox? employeeDto;
+   
     private async Task RegisterUser()
     {
         if(employeeDto!=null)

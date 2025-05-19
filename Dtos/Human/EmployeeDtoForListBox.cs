@@ -16,3 +16,10 @@ public record EmployeeDtoForListBox(
      /// </summary>
      string FullName = ""
 );
+
+public record EmployeeDtoGroupByDept {
+    public int DeptId { get; set; }
+    public required string Name { get; set; }
+    public required IEnumerable<EmployeeSimpleDto> EmployeeSimpleDtos { get; set; }
+}
+public record EmployeeSimpleDto(int Id, string FullName);

@@ -201,4 +201,7 @@
   <data name="Registration" xml:space="preserve">
     <value>Ghi danh tài khoản</value>
   </data>
+  <data name="WorkSchedule" xml:space="preserve">
+    <value>Lịch công tác</value>
+  </data>
 </root>

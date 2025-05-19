@@ -311,5 +311,14 @@ namespace DefaultValue {
                 return ResourceManager.GetString("Unselect", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lịch công tác.
+        /// </summary>
+        internal static string WorkSchedule {
+            get {
+                return ResourceManager.GetString("WorkSchedule", resourceCulture);
+            }
+        }
     }
 }

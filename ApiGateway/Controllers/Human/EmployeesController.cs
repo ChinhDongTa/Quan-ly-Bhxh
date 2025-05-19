@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using DataServices.Entities.Human;
 using Microsoft.AspNetCore.Identity;
 using ApiGateway.Helpers;
+using DongTa.ResponseMessage;
 
 namespace ApiGateway.Controllers.Human;
 
@@ -97,7 +98,6 @@ public class EmployeesController : ControllerBase {
         var employee = await context.Employees.Include(x => x.SalaryCoefficient)
             .Include(x => x.Dept).Include(x => x.Post)
                                 .FirstOrDefaultAsync(x => x.Id == id);
-
         return Ok(ResultExtension.GetResult(employee?.ToDto()));
     }
 
@@ -132,10 +132,24 @@ public class EmployeesController : ControllerBase {
     {
         return Ok(ResultExtension.GetResult(
             await context.Employees.Where(x => x.DeptId == deptId && x.IsQuitJob == false)
-                                    .Include(x => x.SalaryCoefficient).Include(x => x.Dept).Include(x => x.Post)
+                                    .Include(x => x.SalaryCoefficient)
+                                    .Include(x => x.Dept)
+                                    .Include(x => x.Post)
                                     .OrderBy(x => x.SortOrder).ThenBy(x => x.Birthdate)
-                                    .Select(x => x.ToDto()).ToListAsync())
+                                    .Select(x => x.ToDto())
+                                    .ToListAsync())
             );
+    }
+
+    [HttpGet("GetEmployeeDtosForTreeView")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetEmployeeDtosForTreeView()
+    {
+        var result = await context.Departments
+            .Include(x => x.Employees!.Where(e => e.IsQuitJob == false).OrderBy(e => e.SortOrder))
+            .OrderBy(x => x.SortOrder)
+            .Select(x => x.ToEmployeeDtoGroupByDept()).ToListAsync();
+        return Ok(ResultExtension.GetResult(result));
     }
 
     [HttpGet("GetEmployeeDtoForListBox/{name}")]
@@ -146,7 +160,6 @@ public class EmployeesController : ControllerBase {
         {
             var result = await context.Employees.Where(s => s.IsQuitJob == false)
                 .Include(s => s.Dept)
-                .AsSplitQuery()
                 .OrderBy(s => s.FirstName).ThenBy(s => s.LastName)
                 .Select(s => new EmployeeDtoForListBox(s.Id, $"{s.FirstName} {s.LastName}-{s.Dept!.ShortName}"))
                 .ToListAsync();
@@ -157,11 +170,9 @@ public class EmployeesController : ControllerBase {
         {
             var result = await context.Employees.Where(s => s.IsQuitJob == false && (s.FirstName.Contains(name) || s.LastName.Contains(name)))
                 .Include(s => s.Dept)
-                .AsSplitQuery()
                 .OrderBy(s => s.FirstName).ThenBy(s => s.LastName)
                 .Select(s => new EmployeeDtoForListBox(s.Id, $"{s.FirstName} {s.LastName}-{s.Dept!.ShortName}"))
                 .ToListAsync();
-            //FormattableString query = ;
             return Ok(ResultExtension.GetResult(result));
         }
     }
@@ -173,9 +184,8 @@ public class EmployeesController : ControllerBase {
     {
         if (id != dto.Id)
         {
-            return Ok(Result<bool>.Failure(DongTa.ResponseMessage.Message.Notfound));
+            return Ok(Result<bool>.Failure(Message.Notfound));
         }
-
         try
         {
             var employee = context.Employees.Find(id);
@@ -195,14 +205,14 @@ public class EmployeesController : ControllerBase {
         {
             if (!EmployeeExists(id))
             {
-                return Ok(Result<bool>.Failure(DongTa.ResponseMessage.Message.Notfound));
+                return Ok(Result<bool>.Failure(Message.Notfound));
             }
             else
             {
                 throw;
             }
         }
-        return Ok(Result<bool>.Failure(DongTa.ResponseMessage.Message.Notfound));
+        return Ok(Result<bool>.Failure(Message.Notfound));
     }
 
     // POST: api/Employees
@@ -217,7 +227,7 @@ public class EmployeesController : ControllerBase {
             await context.CreateEventLogAsync(await userManager.GetUserAsync(User), HttpContext, ActionBase.Create, $"Thêm mới nhân viên {dto.FirstName} {dto.LastName}");
             return Ok(Result<bool>.BoolResult(success));
         }
-        return Ok(Result<bool>.Failure("Tạo mới nhân viên thất bại"));
+        return Ok(Result<bool>.Failure(InfoMessage.ActionFailed(CRUD.Create, nameof(Employee))));
     }
 
     // DELETE: api/Employees/5
@@ -227,7 +237,7 @@ public class EmployeesController : ControllerBase {
         var employee = await context.Employees.FindAsync(id);
         if (employee == null)
         {
-            return Ok(Result<bool>.Failure(DongTa.ResponseMessage.Message.Notfound));
+            return Ok(Result<bool>.Failure(Message.Notfound));
         }
         context.Employees.Remove(employee);
         var success = await context.SaveChangesAsync() > 0;
@@ -236,7 +246,7 @@ public class EmployeesController : ControllerBase {
             await context.CreateEventLogAsync(await userManager.GetUserAsync(User), HttpContext, ActionBase.Delete, $"Xóa nhân viên có ID={id}");
             return Ok(Result<bool>.BoolResult(success));
         }
-        return Ok(Result<bool>.Failure("Không thể xóa nhân viên"));
+        return Ok(Result<bool>.Failure(InfoMessage.ActionFailed(CRUD.Delete, nameof(Employee))));
     }
 
     private bool EmployeeExists(int id)

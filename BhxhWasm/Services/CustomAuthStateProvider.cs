@@ -47,14 +47,14 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
                 }
                 else
                 {
-                    ClearInfoDto();
+                    ClearToken();
                     Console.WriteLine($"Error fetching user info");
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error fetching user info: {ex.Message}");
-                ClearInfoDto();
+                ClearToken();
             }
         }
 
@@ -103,6 +103,9 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
         return new Result<bool>(false, "Error: Unable to refresh token. Please log in again.");
     }
 
+    /// <summary>
+    /// todo : signout
+    /// </summary>
     public void Logout()
     {
         ClearToken();
@@ -152,22 +155,14 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
-    private void ClearInfoDto()
-    {
-        LocalStorage.RemoveItem("Id");
-        LocalStorage.RemoveItem("Email");
-        LocalStorage.RemoveItem("Username");
-        LocalStorage.RemoveItem("RoleNames");
-    }
-
     private static ClaimsPrincipal CreateClaimsPrincipal(InfoDto infoDto)
     {
         var claims = new List<Claim>
-    {
-        new(ClaimTypes.NameIdentifier, infoDto.Id),
-        new(ClaimTypes.Name, infoDto.Username),
-        new(ClaimTypes.Email, infoDto.Email)
-    };
+                {
+                    new(ClaimTypes.NameIdentifier, infoDto.Id),
+                    new(ClaimTypes.Name, infoDto.Username),
+                    new(ClaimTypes.Email, infoDto.Email)
+                };
 
         if (infoDto.RoleNames != null)
         {
@@ -207,6 +202,13 @@ public class CustomAuthStateProvider : AuthenticationStateProvider {
         LocalStorage.RemoveItem("accessToken");
         LocalStorage.RemoveItem("refreshToken");
         LocalStorage.RemoveItem("expiresIn");
+        LocalStorage.RemoveItem("Id");
+        //LocalStorage.RemoveItem("id");
+        //LocalStorage.RemoveItem("infoDtoId");
+        //LocalStorage.RemoveItem("jwt_token");
+        LocalStorage.RemoveItem("Email");
+        LocalStorage.RemoveItem("Username");
+        LocalStorage.RemoveItem("RoleNames");
         clientBase.SetAuthorizationHeader();
     }
 }

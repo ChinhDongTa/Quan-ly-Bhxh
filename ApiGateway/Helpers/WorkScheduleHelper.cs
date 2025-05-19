@@ -87,6 +87,7 @@ public static class WorkScheduleHelper {
         {
             throw new Exception("Lỗi tạo lịch làm việc");
         }
+        string defaultWork = "- Làm việc";
         // Tạo các WorkShift cho lịch làm việc
         foreach (var workDay in workSchedule.WorkDays)
         {
@@ -97,7 +98,7 @@ public static class WorkScheduleHelper {
             {
                 WorkDayId = workDay.Id,
                 Name = "Sáng",
-                Description = "-Làm việc",
+                Description = defaultWork
             };
 
             workDay.WorkShifts.Add(morning);
@@ -105,7 +106,7 @@ public static class WorkScheduleHelper {
             {
                 WorkDayId = workDay.Id,
                 Name = "Chiều",
-                Description = "-Làm việc",
+                Description = defaultWork
             };
             workDay.WorkShifts.Add(afternoon);
         }

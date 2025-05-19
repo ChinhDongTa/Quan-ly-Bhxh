@@ -33,25 +33,8 @@ public class WorkSchedulesController(BhxhDbContext context, UserManager<ApiUser>
             .Include(ws => ws.User)
                 .ThenInclude(u => u!.Employee)
             .Where(ws => ws.StartDay <= date && ws.EndDay >= date)
-            .Select(ws => new WorkScheduleDto
-            {
-                Id = ws.Id,
-                StartDay = ws.StartDay,
-                EndDay = ws.EndDay,
-                UserId = ws.UserId,
-                InforUserCreated = $"{ws.User!.Employee!.FirstName} {ws.User.Employee.LastName}", // Assuming Employee is a navigation property
-                WorkDays = ws.WorkDays.Select(wd => new WorkDayDto
-                {
-                    Id = wd.Id,
-                    Date = wd.Date,
-                    WorkShiftDtos = wd.WorkShifts!.Select(wsf => new WorkShiftDto
-                    {
-                        Id = wsf.Id,
-                        Name = wsf.Name,
-                        Description = wsf.Description
-                    }).ToList()
-                }).ToList()
-            }).FirstOrDefaultAsync();
+            .Select(ws => ws.ToDto())
+            .FirstOrDefaultAsync();
 
         return Ok(ResultExtension.GetResult(workScheduleDto));
     }
@@ -65,25 +48,8 @@ public class WorkSchedulesController(BhxhDbContext context, UserManager<ApiUser>
            .Include(ws => ws.User)
                .ThenInclude(u => u!.Employee).
                Where(ws => ws.Id == Id)
-           .Select(ws => new WorkScheduleDto
-           {
-               Id = ws.Id,
-               StartDay = ws.StartDay,
-               EndDay = ws.EndDay,
-               UserId = ws.UserId,
-               InforUserCreated = $"{ws.User!.Employee!.FirstName} {ws.User.Employee.LastName}", // Assuming Employee is a navigation property
-               WorkDays = ws.WorkDays.Select(wd => new WorkDayDto
-               {
-                   Id = wd.Id,
-                   Date = wd.Date,
-                   WorkShiftDtos = wd.WorkShifts!.Select(wsf => new WorkShiftDto
-                   {
-                       Id = wsf.Id,
-                       Name = wsf.Name,
-                       Description = wsf.Description
-                   }).ToList()
-               }).ToList()
-           }).FirstOrDefaultAsync(x => x.Id == Id);
+           .Select(ws => ws.ToDto())
+           .FirstOrDefaultAsync(x => x.Id == Id);
         return Ok(ResultExtension.GetResult(workScheduleDto));
     }
 
@@ -95,6 +61,7 @@ public class WorkSchedulesController(BhxhDbContext context, UserManager<ApiUser>
         {
             var workShift = await context.WorkShifts
                 .FirstOrDefaultAsync(x => x.Id == item.Id);
+            if (workShift == null) continue;
             workShift = item.ToEntity(workShift);
             context.Entry(workShift).State = EntityState.Modified;
         }
@@ -103,7 +70,7 @@ public class WorkSchedulesController(BhxhDbContext context, UserManager<ApiUser>
             await context.CreateEventLogAsync(await userManager.GetUserAsync(User), HttpContext, "UpdateList", "Cập nhật lịch làm việc");
             return Ok(Result<bool>.Success(InfoMessage.Success));
         }
-        return Ok(Result<bool>.Failure("Cập nhật lịch làm việc thất bại"));
+        return Ok(Result<bool>.Failure(InfoMessage.ActionFailed(CRUD.Update, InfoMessage.WorkSchedule)));
     }
 
     [HttpGet("CreateNextWeek/{userId}/{dateOnly}")]

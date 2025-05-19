@@ -1,0 +1,42 @@
+﻿@inject IHttpClientBase client
+
+<FluentTreeView Items="TvItems" @bind-SelectedItem=SelectedItems LazyLoadItems="true" />
+
+@code {
+
+    //public EmployeeDtoGroupByDept? SelectedEmployeeDto { get; set; }
+    IEnumerable<EmployeeDtoGroupByDept>? items;
+    private IEnumerable<ITreeViewItem>? TvItems;
+    [Parameter]
+    public ITreeViewItem? SelectedItems { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await client.GetAsync<ResultDto<EmployeeDtoGroupByDept>>(EmployeeApiRoute.GetEmployeeDtosForTreeView);
+        if(result!=null &&result.IsSuccess)
+        {
+            items = result.Dtos;
+            TvItems = CreateTree(items!);
+        }
+    }
+   
+    private IEnumerable<ITreeViewItem> CreateTree(IEnumerable<EmployeeDtoGroupByDept> items)
+    {
+        List<ITreeViewItem> list = new List<ITreeViewItem>();
+        foreach (var item in items)
+        {
+            var treeItem = new TreeViewItem
+                {
+                    Text = item.Name,
+                    Id = item.DeptId.ToString(),
+                    Items = new List<TreeViewItem>(item.EmployeeSimpleDtos
+                                .Select(x => new TreeViewItem()
+                                {
+                                    Id = x.Id.ToString(),
+                                    Text = x.FullName
+                                }))
+                };
+            list.Add(treeItem);
+        } 
+        return list;
+    }
+}

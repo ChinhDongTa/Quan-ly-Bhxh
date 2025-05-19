@@ -10,6 +10,7 @@ public record EmployeeApiRoute : ActionRouteBase {
     public static string GetByUserId(string userId) => $"{ControllerName}/GetByUserId/{userId}";
     public static string GetDeptHeadByUserId(string userId) => $"{ControllerName}/GetDeptHeadByUserId/{userId}";
     public static string GetEmployeeDtoForListBox(string name = "All") => $"{ControllerName}/GetEmployeeDtoForListBox/{name}";
+    public static string GetEmployeeDtosForTreeView => $"{ControllerName}/GetEmployeeDtosForTreeView";
     public static string GetBirthdayInMonth(int montf, bool isAll = false) =>
         $"{ControllerName}/GetBirthdayInMonth/{montf}/{isAll}";
 }

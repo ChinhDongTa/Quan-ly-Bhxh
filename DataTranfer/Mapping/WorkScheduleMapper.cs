@@ -63,15 +63,25 @@ public static class WorkScheduleMapper {
 
     public static WorkScheduleDto ToDto(this WorkSchedule workSchedule)
     {
-        return new()
+        return new WorkScheduleDto
         {
             Id = workSchedule.Id,
             StartDay = workSchedule.StartDay,
             EndDay = workSchedule.EndDay,
             UserId = workSchedule.UserId,
-            WorkDays = workSchedule.WorkDays?.Select(x => x.ToDto()).ToList() ?? [], // Ensure non-null assignment
-            InforUserCreated = $"{workSchedule.User?.Employee?.FirstName} {workSchedule.User?.Employee?.LastName}", // Assuming Employee is a navigation property
-            UpdateAt = workSchedule.UpdateAt
+            UpdateAt = workSchedule.UpdateAt,
+            InfoUserCreated = $"{workSchedule.User?.Employee?.FirstName ?? ""} {workSchedule.User?.Employee?.LastName ?? ""}",
+            WorkDays = [.. workSchedule.WorkDays.Select(wd => new WorkDayDto
+            {
+                Id = wd.Id,
+                Date = wd.Date,
+                WorkShiftDtos = wd.WorkShifts?.Select(wsf => new WorkShiftDto
+                {
+                    Id = wsf.Id,
+                    Name = wsf.Name,
+                    Description = wsf.Description
+                }).ToList()
+            })]
         };
     }
 

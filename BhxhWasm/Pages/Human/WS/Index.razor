@@ -70,7 +70,7 @@ else
             }
         </tbody>
     </table>
-    @* <label style="padding-bottom:20px">Người tạo: @workScheduleDto.InforUserCreated</label> *@
+    @* <label style="padding-bottom:20px">Người tạo: @workScheduleDto.InfoUserCreated</label> *@
 
     <FluentStack HorizontalGap="10">
         <FluentButton Appearance=Appearance.Neutral IconStart="@(new Icons.Filled.Size24.ArrowCircleLeft().WithColor(Color.Success))" @onclick="BtnBack"></FluentButton>
@@ -107,7 +107,7 @@ else
         }
         else
         {
-            message = InfoMessage.ActionFailed(CRUD.Read ,"Lịch công tác");
+            message = InfoMessage.ActionFailed(CRUD.Read, InfoMessage.WorkSchedule);
         }
     }
 
@@ -152,7 +152,7 @@ else
             }
             else
             {
-                message = InfoMessage.ActionFailed(CRUD.Create, "Lịch công tác");
+                message = InfoMessage.ActionFailed(CRUD.Create, InfoMessage.WorkSchedule);
             }
         }
     }
@@ -174,7 +174,7 @@ else
             else
             {
                 //workScheduleDto = new();
-                message = InfoMessage.NotFound("Lịch công tác");
+                message = InfoMessage.NotFound(InfoMessage.WorkSchedule);
             }
         }
     }
@@ -197,7 +197,7 @@ else
             }
             else
             {
-                message = InfoMessage.NotFound("Lịch công tác");
+                message = InfoMessage.NotFound(InfoMessage.WorkSchedule);
             }
         }
     }
@@ -218,12 +218,12 @@ else
             }
             else
             {
-                message = InfoMessage.ActionFailed(CRUD.Update,"Lịch công tấc");
+                message = InfoMessage.ActionFailed(CRUD.Update,InfoMessage.WorkSchedule);
             }
         }
     }
 
-    // Chuyển kiểu DateOnly sáng chuỗi Việt =>"Thứ sáu (18/04/2025)"
+    // Chuyển kiểu DateOnly sang chuỗi Việt =>"Thứ sáu (18/04/2025)"
     static MarkupString GetDayOfWeek(DateOnly date)
     {
         // Vietnamese day names

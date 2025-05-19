@@ -14,7 +14,6 @@ public record InfoMessage {
     public static string ActionSuccess(CRUD actionName, string objName) => string.Format(Resources.ActionSuccess, actionName.CRUD2String(), objName);
     public static string ActionFailed(CRUD actionName, string objName) => string.Format(Resources.ActionFailed, actionName.CRUD2String(), objName);
     public static string CrudResult(CRUD actionName, bool? result, string objName) => (result ?? false) ? ActionSuccess(actionName, objName) : ActionFailed(actionName, objName);
-    //public static string ActionSuccess(string actionName) => string.Format(Resources.ActionSuccess, actionName);
-    //public static string ActionFailed(string actionName) => string.Format(Resources.ActionFailed, actionName);
     public static string EmailOrPasswordInvalid => Resources.EmailOrPasswordInvalid;
+    public static string WorkSchedule => Resources.WorkSchedule;
 }

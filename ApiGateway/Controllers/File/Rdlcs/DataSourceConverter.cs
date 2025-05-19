@@ -19,7 +19,6 @@ internal class DataSourceConverter {
 
             if (xepLoaiDonVi is not null)
             {
-                // Lấy tất cả nhân viên liên quan đến các phòng ban trong một truy vấn
                 var deptIds = xepLoaiDonVi.Select(d => d.DeptId).ToList();
                 List<QuarterEmployeeRankDto> allEmployeeRanks = await GetQuarterEmployeeRankDtoBy(context, thamSo, deptIds);
 
@@ -67,7 +66,6 @@ internal class DataSourceConverter {
                         }
                     }
                 }
-
                 return list;
             }
             return null;
@@ -199,7 +197,6 @@ internal class DataSourceConverter {
             default:
                 break;
         }
-
         return caNhanLine;
     }
 

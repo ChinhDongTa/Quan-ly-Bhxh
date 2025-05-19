@@ -72,4 +72,14 @@ public static class EmployeeMapper {
         employee.Gender = dto.Gender;
         return employee;
     }
+
+    public static EmployeeDtoGroupByDept ToEmployeeDtoGroupByDept(this Department dept)
+    {
+        return new EmployeeDtoGroupByDept()
+        {
+            DeptId = dept.Id,
+            Name = dept.Name,
+            EmployeeSimpleDtos = [.. dept.Employees!.Select(x => new EmployeeSimpleDto(x.Id, $"{x.FirstName} {x.LastName}"))]
+        };
+    }
 }
